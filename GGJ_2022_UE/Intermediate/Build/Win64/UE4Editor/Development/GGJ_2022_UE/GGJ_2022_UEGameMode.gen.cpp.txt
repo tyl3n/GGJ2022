@@ -1,0 +1,9 @@
+C:\Users\Ubisoft\Documents\Unreal Projects\GGJ_2022\GGJ_2022_UE\Intermediate\Build\Win64\UE4Editor\Development\GGJ_2022_UE\Definitions.GGJ_2022_UE.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\CoreUObject\Public\UObject/GeneratedCppIncludes.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\CoreUObject\Public\UObject/MetaData.h
+C:\Users\Ubisoft\Documents\Unreal Projects\GGJ_2022\GGJ_2022_UE\Source\GGJ_2022_UE/GGJ_2022_UEGameMode.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\GameFramework/GameModeBase.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Source\Runtime\Engine\Classes\Engine/ServerStatReplicator.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ServerStatReplicator.generated.h
+C:\Program Files\Epic Games\UE_4.27\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameModeBase.generated.h
+C:\Users\Ubisoft\Documents\Unreal Projects\GGJ_2022\GGJ_2022_UE\Intermediate\Build\Win64\UE4Editor\Inc\GGJ_2022_UE\GGJ_2022_UEGameMode.generated.h

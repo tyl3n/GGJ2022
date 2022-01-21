@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"C:\\Users\\Ubisoft\\Documents\\Unreal Projects\\GGJ_2022\\GGJ_2022_UE\\Source\\GGJ_2022_UE\\GGJ_2022_UE.Build.cs",
+		"C:\\Users\\Ubisoft\\Documents\\Unreal Projects\\GGJ_2022\\GGJ_2022_UE\\Source\\GGJ_2022_UE.Target.cs",
+		"C:\\Users\\Ubisoft\\Documents\\Unreal Projects\\GGJ_2022\\GGJ_2022_UE\\Source\\GGJ_2022_UEEditor.Target.cs"
+	],
+	"EngineVersion": "4.27.2"
+}

@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "GGJ_2022_UE",
+			"Path": "C:\\Users\\Ubisoft\\Documents\\Unreal Projects\\GGJ_2022\\GGJ_2022_UE\\Source\\GGJ_2022_UE.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "GGJ_2022_UEEditor",
+			"Path": "C:\\Users\\Ubisoft\\Documents\\Unreal Projects\\GGJ_2022\\GGJ_2022_UE\\Source\\GGJ_2022_UEEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

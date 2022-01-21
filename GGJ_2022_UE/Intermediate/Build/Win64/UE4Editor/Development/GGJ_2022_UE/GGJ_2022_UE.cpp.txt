@@ -1,0 +1,2 @@
+C:\Users\Ubisoft\Documents\Unreal Projects\GGJ_2022\GGJ_2022_UE\Intermediate\Build\Win64\UE4Editor\Development\GGJ_2022_UE\Definitions.GGJ_2022_UE.h
+C:\Users\Ubisoft\Documents\Unreal Projects\GGJ_2022\GGJ_2022_UE\Source\GGJ_2022_UE\GGJ_2022_UE.h
