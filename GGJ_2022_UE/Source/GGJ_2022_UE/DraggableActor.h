@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "GGJShapeDefinition.h"
+
 #include "DraggableActor.generated.h"
 
 UENUM(BlueprintType)
@@ -61,6 +63,9 @@ public:
 	float ReleasedTimestamp;
 
 	UPROPERTY(Transient, BlueprintReadOnly)
+	class UStaticMeshComponent* MasterStaticMesh;
+
+	UPROPERTY(Transient, BlueprintReadOnly)
 	TArray<class UStaticMeshComponent*> StaticMeshes;
 
 	UPROPERTY(Transient, BlueprintReadOnly)
@@ -99,6 +104,6 @@ public:
 	static void ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActor* snapMover, class UBoxComponent*& out_SnapSocket, class UStaticMeshComponent*& out_SnapComponent);
 	static void SnapDraggable(class UBoxComponent* snapSocket, class UPrimitiveComponent* snapComponent);
 
-	void ConvertToShapeDefinition();
+	FGGJShapeDefinition ConvertToShapeDefinition();
 };
 
