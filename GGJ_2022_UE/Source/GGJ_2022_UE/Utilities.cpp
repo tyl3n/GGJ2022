@@ -3,9 +3,11 @@
 
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
 
 #include "GGJGameMode.h"
 #include "GGJWorldSettings.h"
+#include "GGJCharacter.h"
 
 UWorld* Utils::GetGameWorld()
 {
@@ -65,6 +67,22 @@ AGGJWorldSettings* Utils::GetWorldSettings()
 	}
 
 	return Cast<AGGJWorldSettings>(world->GetWorldSettings());
+}
+
+AGGJCharacter* Utils::GetLocalPlayer()
+{
+	for (TActorIterator<AGGJCharacter> it(GetGameWorld()); it; ++it)
+	{
+		if(AGGJCharacter* character = *it)
+		{
+			if (character->IsLocallyControlled())
+			{
+				return character;
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 

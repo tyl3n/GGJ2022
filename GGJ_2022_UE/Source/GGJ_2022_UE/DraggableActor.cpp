@@ -4,6 +4,8 @@
 #include "DrawDebugHelpers.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/LineBatchComponent.h"
+#include "Engine/World.h"
 
 #include "Utilities.h"
 
@@ -26,6 +28,15 @@ void ADraggableActor::BeginPlay()
 	}
 
 	ReleasedTimestamp = 0.0f;
+}
+
+void ADraggableActor::SetMergeState(EMergeState newMergeState)
+{
+	if (newMergeState != MergeState)
+	{
+		MergeState = newMergeState;
+		OnMergeStateChanged();
+	}
 }
 
 void ADraggableActor::OnDraggableSelected_Implementation()
@@ -67,7 +78,8 @@ void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 
 		OnDragged(dragLength);
 
-		DrawDebugLine(GetWorld(), location, dragPoint, FColor::Blue);
+
+		GetWorld()->LineBatcher->DrawLine(location, dragPoint, DrawLineColor, SDPG_World, DragLineThickness);
 	}
 }
 
@@ -81,19 +93,35 @@ float ADraggableActor::GetDraggableZ() const
 	return 0.0f;
 }
 
+void ADraggableActor::Rotate(float dirSign)
+{
+	if (UStaticMeshComponent* staticMesh = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass())))
+	{
+		staticMesh->AddAngularImpulseInRadians(FVector(dirSign * RotateMultiplier, dirSign * RotateMultiplier, dirSign * RotateMultiplier) * StaticMeshes.Num(), NAME_None, RotateAsVelChange);
+	}
+}
+
 void ADraggableActor::RefreshComponents()
 {
+	int staticMeshesCount = StaticMeshes.Num();
 	for (UActorComponent* component : GetComponents())
 	{
 		if (UStaticMeshComponent* primComp = Cast<UStaticMeshComponent>(component))
 		{
+			
 			StaticMeshes.AddUnique(primComp);
+
 		}
 
 		if (UBoxComponent* boxComp = Cast<UBoxComponent>(component))
 		{
 			BoxComponents.AddUnique(boxComp);
 		}
+	}
+
+	if (staticMeshesCount != StaticMeshes.Num())
+	{
+		OnStaticMeshComponentChanged();
 	}
 }
 
@@ -146,9 +174,6 @@ void ADraggableActor::MergeDraggable(ADraggableActor* actorA, ADraggableActor* a
 					actorComponent->SetWorldTransform(boxComp->GetComponentTransform());
 					actorComponent->RegisterComponent();
 					actorComponent->InitializeComponent();
-
-					// DO NOT SUBMIT
-					actorComponent->SetHiddenInGame(false);
 				}
 			}
 		}

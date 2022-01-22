@@ -25,6 +25,7 @@ struct Utils
 	static class AGameStateBase* GetBaseGameState();
 	static class AGGJGameMode* GetGameMode();
 	static class AGGJWorldSettings* GetWorldSettings();
+	static class AGGJCharacter* GetLocalPlayer();
 
 
 	static float GetGameTime(); // local, starts upon game world start

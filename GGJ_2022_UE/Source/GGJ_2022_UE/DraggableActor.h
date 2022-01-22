@@ -3,6 +3,16 @@
 
 #include "DraggableActor.generated.h"
 
+UENUM(BlueprintType)
+enum class EMergeState : uint8
+{
+	None,
+	OnPadButUnmergable,
+	OnPadAndMergable,
+	JustMerged,
+};
+
+
 UCLASS(config=Game)
 class ADraggableActor : public AActor
 {
@@ -15,8 +25,14 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DragForceBaseMultiplier = 100.0f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta=(DisplayName="Drag Spring Multiplier"))
 	float DragSprintMultiplier = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RotateMultiplier = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool RotateAsVelChange = false;
 
 	UPROPERTY(EditDefaultsOnly)
 	FRuntimeFloatCurve DragForce;
@@ -24,18 +40,30 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Mass = 177.83;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float DragLineThickness = 2.0f;
+
 	////////////////////////////////////////
 	/// Dynamic
+
+	UPROPERTY(BlueprintReadWrite)
+	FColor Color = FColor::Yellow;
+
+	UPROPERTY(BlueprintReadWrite)
+	FColor DrawLineColor = FColor::Black;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bDraging = false;
 
+	UPROPERTY(BlueprintReadOnly)
+	EMergeState MergeState;
+
 	float ReleasedTimestamp;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly)
 	TArray<class UStaticMeshComponent*> StaticMeshes;
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly)
 	TArray<class UBoxComponent*> BoxComponents;
 
 	ADraggableActor();
@@ -48,11 +76,21 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDraggableReleased();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMergeStateChanged();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnStaticMeshComponentChanged();
+
+	void SetMergeState(EMergeState newMergeState);
+
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDragged(float distance);
 
 	virtual void Drag(FVector& dragPoint, float deltaTime);
 	virtual float GetDraggableZ() const;
+
+	virtual void Rotate(float dirSign);
 
 	void RefreshComponents();
 	void RefreshMass();
