@@ -73,29 +73,4 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-GGJ_2022_UE/Intermediate/Build/Win64/GGJ_2022_UEEditor/Development/GGJ_2022_UEEditor.uhtmanifest
-GGJ_2022_UE/Intermediate/Build/Win64/GGJ_2022_UEEditor/Development/Makefile.bin
-GGJ_2022_UE/Intermediate/Build/Win64/GGJ_2022_UEEditor/Development/Metadata.dat
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Development/ActionHistory.bin
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Development/GGJ_2022_UE/UE4Editor-GGJ_2022_UE.dll.response
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Development/GGJ_2022_UE/UE4Editor-GGJ_2022_UE.lib.response
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Inc/GGJ_2022_UE/GGJ_2022_UE.init.gen.cpp
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Inc/GGJ_2022_UE/GGJ_2022_UECharacter.gen.cpp
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Inc/GGJ_2022_UE/GGJ_2022_UECharacter.generated.h
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Inc/GGJ_2022_UE/GGJ_2022_UEGameMode.gen.cpp
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Inc/GGJ_2022_UE/GGJ_2022_UEGameMode.generated.h
-GGJ_2022_UE/Intermediate/Build/Win64/UE4Editor/Inc/GGJ_2022_UE/Timestamp
-GGJ_2022_UE/Intermediate/CachedAssetRegistry.bin
-GGJ_2022_UE/Intermediate/ProjectFiles/GGJ_2022_UE.vcxproj
-GGJ_2022_UE/Intermediate/ProjectFiles/GGJ_2022_UE.vcxproj.filters
-GGJ_2022_UE/Intermediate/ProjectFiles/UE4.vcxproj.filters
-GGJ_2022_UE/Saved/Config/Windows/Editor.ini
-GGJ_2022_UE/Saved/Config/Windows/EditorPerProjectUserSettings.ini
-GGJ_2022_UE/Saved/Config/Windows/Engine.ini
-GGJ_2022_UE/Saved/Config/Windows/GameUserSettings.ini
-GGJ_2022_UE/Saved/Logs/GGJ_2022_UE.log
-GGJ_2022_UE/Saved/Config/Windows/GameUserSettings.ini
-GGJ_2022_UE/Saved/Config/Windows/Engine.ini
-GGJ_2022_UE/Saved/Config/Windows/EditorPerProjectUserSettings.ini
-GGJ_2022_UE/Saved/Config/Windows/Editor.ini
-GGJ_2022_UE/Intermediate/CachedAssetRegistry.bin
+Intermediate
