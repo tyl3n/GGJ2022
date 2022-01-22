@@ -30,6 +30,22 @@ struct Utils
 	static float GetGameTime(); // local, starts upon game world start
 	static float ElapsedTime(float eventTime);
 	static bool IsRecentEvent(float eventTime, float maxDelay); // uses GameTime
+
+	FORCEINLINE static float NormalizeRotAngle(float angle)
+	{
+		angle = FMath::Fmod(angle, 360.0f);
+
+		if (angle <= -180.0f)
+		{
+			angle += 360.0f;
+		}
+		else if (angle >= 180.0f)
+		{
+			angle -= 360.0f;
+		}
+		checkSlow(angle >= -180.0f && angle <= 180.0f);
+		return angle;
+	}
 };
 
 #define ECC_Draggable					ECollisionChannel::ECC_GameTraceChannel1

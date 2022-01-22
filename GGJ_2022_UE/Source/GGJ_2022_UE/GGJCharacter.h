@@ -16,6 +16,7 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(class AController* NewController) override;
 
 	virtual void Tick(float deltaTime) override;
 
