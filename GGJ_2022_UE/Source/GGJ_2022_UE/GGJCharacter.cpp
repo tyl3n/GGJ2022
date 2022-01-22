@@ -78,13 +78,29 @@ void AGGJCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(AGGJWorldSettings* worldSettings = Utils::GetWorldSettings())
+	if (AGGJWorldSettings* worldSettings = Utils::GetWorldSettings())
 	{
 		FViewTargetTransitionParams params;
 		params.BlendTime = 0.0f;
-		Cast<APlayerController>(GetController())->SetViewTarget(worldSettings->LevelCamera.Get(), params);
-	}
 
+		if (APlayerController* playerController = Cast<APlayerController>(GetController()))
+		{
+			playerController->SetViewTarget(worldSettings->LevelCamera.Get(), params);
+		}
+	}
+}
+
+void AGGJCharacter::PossessedBy(class AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AGGJWorldSettings* worldSettings = Utils::GetWorldSettings())
+	{
+		FViewTargetTransitionParams params;
+		params.BlendTime = 0.0f;
+
+		Cast<APlayerController>(NewController)->SetViewTarget(worldSettings->LevelCamera.Get(), params);
+	}
 }
 
 void AGGJCharacter::TurnAtRate(float Rate)
