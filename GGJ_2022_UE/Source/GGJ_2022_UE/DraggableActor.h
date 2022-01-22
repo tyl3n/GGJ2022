@@ -18,11 +18,15 @@ public:
 	float DragForceBaseMultiplier = 100.0f;
 
 	UPROPERTY(EditDefaultsOnly)
+	float DragSprintMultiplier = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly)
 	FRuntimeFloatCurve DragForce;
 
 	////////////////////////////////////////
 	/// Dynamic
 
+	UPROPERTY(BlueprintReadOnly)
 	bool bDraging = false;
 
 	ADraggableActor();
@@ -36,7 +40,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDragged(float distance);
 
-	virtual void Drag(FVector& dragPoint);
+	virtual void Drag(FVector& dragPoint, float deltaTime);
 	virtual float GetDraggableZ() const;
+
+	static void MergeDraggable(ADraggableActor* actorA, ADraggableActor* actorB);
 };
 

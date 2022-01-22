@@ -14,6 +14,11 @@ FORCEINLINE FVector Vec2D(const FVector2D& v) { return FVector(v.X, v.Y, 0); }
 FORCEINLINE FVector Vec3D(const FVector2D& v) { return FVector(v.X, v.Y, 0); }
 FORCEINLINE FVector2D ToVec2D(const FVector& v) { return FVector2D(v.X, v.Y); }
 
+template< class T, class U > FORCEINLINE U MapClamped(T x, T minX, T maxX, U outEdge0, U outEdge1)
+{
+	return FMath::Clamp((U)(outEdge0 + (outEdge1 - outEdge0) * (x - minX) / (maxX - minX)), FMath::Min(outEdge0, outEdge1), FMath::Max(outEdge0, outEdge1));
+}
+
 struct Utils
 {
 	static class UWorld* GetGameWorld();

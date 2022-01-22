@@ -24,7 +24,7 @@ void ADraggableActor::OnDragged_Implementation(float length)
 	bDraging = true;
 }
 
-void ADraggableActor::Drag(FVector& dragPoint)
+void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 {
 	if (UStaticMeshComponent* staticMesh = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass())))
 	{
@@ -36,7 +36,12 @@ void ADraggableActor::Drag(FVector& dragPoint)
 		dragVector.ToDirectionAndLength(dragDir, dragLength);
 
 		float forceStrength = DragForce.GetRichCurveConst()->Eval(dragLength) * DragForceBaseMultiplier;
-		FVector force = dragDir * forceStrength;
+
+		TWEAKABLE float SpringMax = 1000.0f;
+		TWEAKABLE float SpringMin = 500.0f;
+		float springMultiplier = MapClamped(dragLength, SpringMax, SpringMin, 0.0f, 1.0f);
+
+		FVector force = dragDir * (forceStrength  - (DragSprintMultiplier * dragLength * springMultiplier));
 
 		staticMesh->AddForce(force);
 

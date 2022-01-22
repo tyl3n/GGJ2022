@@ -48,7 +48,7 @@ void AGGJCharacter::Tick(float deltaTime)
 		FPlane plane = FPlane(VecZ(DraggedActor->GetDraggableZ()), FVector::UpVector);
 		FVector dragPoint = FMath::RayPlaneIntersection(mouseLocation, mouseDirection, plane);
 
-		DraggedActor->Drag(dragPoint);
+		DraggedActor->Drag(dragPoint, deltaTime);
 	}
 	
 }
