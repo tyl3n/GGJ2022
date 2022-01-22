@@ -15,5 +15,5 @@ public:
 	static class AGGJCharacter* GetLocalPlayer();
 
 	UFUNCTION(BlueprintCallable, Category="GGJ")
-	void TriggerMerge();
+	static void TriggerMerge();
 };
