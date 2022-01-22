@@ -3,10 +3,10 @@
 
 #include "GGJShapeDefinition.h"
 
-UGGJShapeDefinition::UGGJShapeDefinition()
+FGGJShapeDefinition::FGGJShapeDefinition()
 {
 }
 
-UGGJShapeDefinition::~UGGJShapeDefinition()
+FGGJShapeDefinition::~FGGJShapeDefinition()
 {
 }

@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GGJShapeDefinition.generated.h"
 
-UCLASS(Blueprintable)
-class UGGJShapeDefinition : public UObject
+USTRUCT(Blueprintable)
+struct FGGJShapeDefinition 
 {
 	GENERATED_BODY()
 public:
@@ -14,8 +14,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<bool> ShapeArray;
 
-	UGGJShapeDefinition();
-	~UGGJShapeDefinition();
+	FGGJShapeDefinition();
+	~FGGJShapeDefinition();
 };
 
 
