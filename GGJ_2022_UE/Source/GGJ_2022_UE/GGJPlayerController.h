@@ -15,7 +15,7 @@ public:
 	AGGJPlayerController();
 
 	virtual void BeginPlay() override;
-
+	virtual void SpawnPlayerCameraManager() override;
 };
 
 
