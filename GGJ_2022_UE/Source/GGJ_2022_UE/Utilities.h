@@ -2,6 +2,12 @@
 
 #include "CoreMinimal.h"
 
+#if UE_BUILD_SHIPPING
+#define TWEAKABLE const
+#else
+#define TWEAKABLE static
+#endif
+
 FORCEINLINE FVector VecZ(float z) { return FVector(0, 0, z); }
 FORCEINLINE FVector Vec2D(const FVector& v) { return FVector(v.X, v.Y, 0); }
 FORCEINLINE FVector Vec2D(const FVector2D& v) { return FVector(v.X, v.Y, 0); }
@@ -20,4 +26,18 @@ struct Utils
 	static float ElapsedTime(float eventTime);
 	static bool IsRecentEvent(float eventTime, float maxDelay); // uses GameTime
 };
+
+#define ECC_Draggable					ECollisionChannel::ECC_GameTraceChannel1
+//#define ECC_Trigger					ECollisionChannel::ECC_GameTraceChannel2
+//#define ECC_Pushable					ECollisionChannel::ECC_GameTraceChannel3
+//#define ECC_Audio						ECollisionChannel::ECC_GameTraceChannel4
+//#define ECC_PlayerBlocking			ECollisionChannel::ECC_GameTraceChannel5
+//#define ECC_NPCBlocking				ECollisionChannel::ECC_GameTraceChannel6
+//#define ECC_PawnDetection  			ECollisionChannel::ECC_GameTraceChannel7
+//#define ECC_WorldObjectTrace			ECollisionChannel::ECC_GameTraceChannel8
+//#define ECC_EssentialItemBlocking		ECollisionChannel::ECC_GameTraceChannel9
+//#define ECC_RoomDetection				ECollisionChannel::ECC_GameTraceChannel10
+//#define ECC_FootStep					ECollisionChannel::ECC_GameTraceChannel11
+//#define ECC_PlayerFalling				ECollisionChannel::ECC_GameTraceChannel12
+//#define ECC_PhysicalParticles			ECollisionChannel::ECC_GameTraceChannel13
 
