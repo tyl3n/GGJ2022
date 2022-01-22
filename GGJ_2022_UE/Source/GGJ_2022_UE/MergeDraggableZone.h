@@ -8,10 +8,7 @@ class AMergeDraggableZone : public AActor
 {
 	GENERATED_BODY()
 public:
-	
-	AMergeDraggableZone();
 
-	UFUNCTION(BlueprintCallable)
-	void MergeTouchingDraggableActors();
+	AMergeDraggableZone();
 };
 

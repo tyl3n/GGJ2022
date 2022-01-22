@@ -11,6 +11,16 @@ class AGGJCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
+
+	//////////////////////////////////////////////////////////////////////////
+	/// Dynamic
+
+	UPROPERTY(Transient)
+	TArray<class ADraggableActor*> TouchingDraggableActors;
+
+	UPROPERTY(Transient)
+	TArray<class ADraggableActor*> MergeableDraggableActors;
+
 	AGGJCharacter();
 
 protected:
@@ -19,9 +29,16 @@ protected:
 	virtual void PossessedBy(class AController* NewController) override;
 
 	virtual void Tick(float deltaTime) override;
+	void TickMergables();
 
 	void SelectPressed();
 	void SelectReleased();
+
+	void RotateDraggable(float value);
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void MergeTouchingDraggableActors();
 	
 protected:
 	// APawn interface
