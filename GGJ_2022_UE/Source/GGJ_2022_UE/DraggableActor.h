@@ -98,5 +98,7 @@ public:
 	static void MergeDraggable(ADraggableActor* actorA, ADraggableActor* actorB);
 	static void ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActor* snapMover, class UBoxComponent*& out_SnapSocket, class UStaticMeshComponent*& out_SnapComponent);
 	static void SnapDraggable(class UBoxComponent* snapSocket, class UPrimitiveComponent* snapComponent);
+
+	void ConvertToShapeDefinition();
 };
 

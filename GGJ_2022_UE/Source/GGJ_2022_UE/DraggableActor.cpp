@@ -254,3 +254,44 @@ void ADraggableActor::SnapDraggable(class UBoxComponent* snapSocket, class UPrim
 		snapComponent->GetAttachParent()->SetWorldTransform(FTransform(snapSocketQuat, snapSocketLocation, snapSocketScale));
 	}
 }
+
+void ADraggableActor::ConvertToShapeDefinition()
+{
+	int minX = 1000;
+	int minY = 1000;
+	TArray< TPair<int, int> > coords;
+
+	for (UStaticMeshComponent* staticMesh : StaticMeshes)
+	{
+		TPair<int, int>& coord = coords.AddZeroed_GetRef();
+		if (staticMesh->GetAttachParent() == nullptr)
+		{
+			coord.Key = 0;
+			coord.Value = 0;
+		}
+		else
+		{
+			FVector relativeLocation = staticMesh->GetRelativeLocation();
+			coord.Key = FMath::RoundToInt(relativeLocation.X / 100.0f);
+			coord.Value = FMath::RoundToInt(relativeLocation.Y / 100.0f);
+		}
+
+		if (coord.Key < minX)
+		{
+			minX = coord.Key;
+		}
+
+		if (coord.Value < minY)
+		{
+			minY = coord.Value;
+		}
+	}
+
+	for (TPair<int, int>& coord : coords)
+	{
+		coord.Key += minX;
+		coord.Value += minY;
+	}
+
+
+}
