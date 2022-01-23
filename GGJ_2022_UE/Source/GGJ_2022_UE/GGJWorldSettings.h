@@ -26,9 +26,6 @@ public:
 	TArray<float> InitialBonusTime;
 
 	UPROPERTY(EditAnywhere, Category = "GGJ")
-	float SpawnInterval = 12.0f;
-
-	UPROPERTY(EditAnywhere, Category = "GGJ")
 	float MissionsInterval = 20.0f;
 
 	UPROPERTY(EditAnywhere, Category = "GGJ")

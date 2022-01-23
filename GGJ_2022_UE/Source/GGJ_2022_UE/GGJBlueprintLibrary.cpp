@@ -5,6 +5,8 @@
 #include "GGJCharacter.h"
 #include "GGJShapeDefinition.h"
 #include "GGJObjective.h"
+#include "GGJWorldSettings.h"
+#include "GGJGameState.h"
 
 class AGGJCharacter* UGGJBlueprintLibrary::GetLocalPlayer(UObject* context)
 {
@@ -32,6 +34,32 @@ float UGGJBlueprintLibrary::GetGameTime()
 float UGGJBlueprintLibrary::GetElapsedGameTime(float timestamp)
 {
 	return Utils::ElapsedTime(timestamp);
+}
+
+FColor UGGJBlueprintLibrary::GetResourceColor(UObject* context, int resourceID)
+{
+	if (Utils::IsInEditor(context))
+	{
+		if (AGGJGameState* gameState = Utils::GetEditorGameState())
+		{
+			return gameState->GetResourceColor(resourceID);
+		}
+		else
+		{
+			return FColor::Black;
+		}
+	}
+	else
+	{
+		if (AGGJGameState* gameState = Utils::GetGameState())
+		{
+			return gameState->GetResourceColor(resourceID);
+		}
+		else
+		{
+			return FColor::Black;
+		}
+	}
 }
 
 bool UGGJBlueprintLibrary::GetShapeDefinitionValue(const FGGJShapeDefinition& shapeDefinition, int x, int y)

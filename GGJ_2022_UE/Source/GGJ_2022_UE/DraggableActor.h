@@ -56,8 +56,8 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FColor DrawLineColor = FColor::Black;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int RessourceID = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", ClampMax = "4", UIMin = "0", UIMax = "4"))
+	int RessourceID = -1;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bDraging = false;

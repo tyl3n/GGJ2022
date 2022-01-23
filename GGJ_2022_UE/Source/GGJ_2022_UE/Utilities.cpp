@@ -4,6 +4,8 @@
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameMapsSettings.h"
 
 #include "GGJGameMode.h"
 #include "GGJWorldSettings.h"
@@ -11,6 +13,47 @@
 #include "GGJGameState.h"
 #include "GGJPlayerController.h"
 #include "GGJPlayerState.h"
+#include "GGJWorldSettings.h"
+
+#if WITH_EDITOR
+#include "Editor.h"
+#endif
+
+bool Utils::IsInEditor(const UObject* worldContext, bool bAllowEditorPreview)
+{
+#if !WITH_EDITOR
+	return false;
+#else
+	if (IsRunningCommandlet())
+	{
+		return false; // not editor, but not the game either - not sure what we want in this context
+	}
+
+	if (worldContext == nullptr)
+	{
+		return false;
+	}
+
+	UWorld* world = worldContext->GetWorld();
+
+	if (!world)
+	{
+		return GIsEditor;
+	}
+
+	switch (world->WorldType)
+	{
+	case EWorldType::Editor:
+		return true;
+	case EWorldType::EditorPreview:
+		return bAllowEditorPreview;
+	case EWorldType::PIE:
+		return false;
+	}
+
+	return GIsEditor;
+#endif
+}
 
 UWorld* Utils::GetGameWorld(UObject* context)
 {
@@ -40,6 +83,34 @@ UWorld* Utils::GetGameWorld(UObject* context)
 	return theWorld;
 }
 
+UWorld* Utils::GetEditorWorld()
+{
+	UWorld* theWorld = nullptr;
+
+	for (const FWorldContext& Context : GEngine->GetWorldContexts())
+	{
+		UWorld* curWorld = Context.World();
+		if (curWorld && curWorld->WorldType == EWorldType::Editor)
+		{
+#if WITH_EDITOR
+			if (GIsEditor && GEditor->PlayWorld == curWorld)
+			{
+				return curWorld;
+			}
+#endif
+
+			if(theWorld != nullptr)
+			{
+				return theWorld;
+			}
+
+			theWorld = curWorld;
+		}
+	}
+
+	return theWorld;
+}
+
 AGGJGameState* Utils::GetGameState()
 {
 	UWorld* world = GetGameWorld();
@@ -51,6 +122,31 @@ AGGJGameState* Utils::GetGameState()
 	{
 		return nullptr;
 	}
+}
+
+AGGJGameState* Utils::GetEditorGameState()
+{
+	if (AGGJWorldSettings* worldSettings = GetEditorWorldSettings())
+	{
+		AGGJGameMode* gameMode = Cast<AGGJGameMode>(UGameplayStatics::GetGameMode(worldSettings));
+
+		if (gameMode == nullptr)
+		{
+			FSoftClassPath classPath = UGameMapsSettings::GetGlobalDefaultGameMode();
+			TSubclassOf<AGameModeBase> gameModeClass = classPath.TryLoadClass<AGameModeBase>();
+			gameMode = Cast<AGGJGameMode>(gameModeClass->GetDefaultObject<AGGJGameMode>());
+		}
+
+		if(gameMode)
+		{
+			if (gameMode->GameStateClass != nullptr)
+			{
+				return gameMode->GameStateClass->GetDefaultObject<AGGJGameState>();
+			}
+		}
+	}
+	
+	return nullptr;
 }
 
 AGGJGameMode* Utils::GetGameMode()
@@ -75,6 +171,19 @@ AGGJWorldSettings* Utils::GetWorldSettings()
 	}
 
 	return Cast<AGGJWorldSettings>(world->GetWorldSettings());
+}
+
+AGGJWorldSettings* Utils::GetEditorWorldSettings()
+{
+	UWorld* world = GetEditorWorld();
+	if (world != nullptr)
+	{
+		return Cast<AGGJWorldSettings>(world->GetWorldSettings());
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 AGGJCharacter* Utils::GetLocalPlayer(UObject* context)

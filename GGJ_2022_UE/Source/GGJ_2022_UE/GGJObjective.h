@@ -28,6 +28,7 @@ public:
 	UPROPERTY(NotReplicated, BlueprintReadOnly)
 	float AddedTimestamp = -1.0f;
 
+	UPROPERTY(Transient)
 	uint32 ShapeCode;
 
 	FGGJObjective();

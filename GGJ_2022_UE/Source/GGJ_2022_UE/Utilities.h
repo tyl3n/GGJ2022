@@ -21,13 +21,19 @@ template< class T, class U > FORCEINLINE U MapClamped(T x, T minX, T maxX, U out
 
 struct Utils
 {
+	static bool IsInEditor(const UObject* worldContext, bool bAllowEditorPreview = true);
+
 	static class UWorld* GetGameWorld(UObject* context = nullptr);
+	static class UWorld* GetEditorWorld();
 	static class AGGJGameState* GetGameState();
+	static class AGGJGameState* GetEditorGameState();
 	static class AGGJGameMode* GetGameMode();
 	static class AGGJWorldSettings* GetWorldSettings();
+	static class AGGJWorldSettings* GetEditorWorldSettings();
 	static class AGGJCharacter* GetLocalPlayer(UObject* context);
 	static class AGGJPlayerController* GetLocalPlayerController(UObject* context);
 	static class AGGJPlayerState* GetLocalPlayerState(UObject* context);
+
 
 
 	static float GetGameTime(); // local, starts upon game world start
