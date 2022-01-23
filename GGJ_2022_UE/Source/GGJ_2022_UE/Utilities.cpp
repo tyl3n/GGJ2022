@@ -79,14 +79,12 @@ AGGJWorldSettings* Utils::GetWorldSettings()
 
 AGGJCharacter* Utils::GetLocalPlayer(UObject* context)
 {
-	for (TActorIterator<AGGJCharacter> it(GetGameWorld(context)); it; ++it)
+	
+	if (AGGJPlayerController* playerController = Cast<AGGJPlayerController>(GetLocalPlayerController(context)))
 	{
-		if(AGGJCharacter* character = *it)
+		if (AGGJCharacter * character  = Cast<AGGJCharacter>(playerController->GetPawn()))
 		{
-			if (character->IsLocallyControlled())
-			{
-				return character;
-			}
+			return character;
 		}
 	}
 
