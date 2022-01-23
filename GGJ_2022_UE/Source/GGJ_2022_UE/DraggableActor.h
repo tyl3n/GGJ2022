@@ -79,6 +79,11 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly)
 	TArray<class UBoxComponent*> BoxComponents;
 
+	UPROPERTY(Transient)
+	ADraggableActor* MergedInto = nullptr;
+
+	FTransform SnapDeltaTransform;
+
 	ADraggableActor();
 
 	virtual void BeginPlay() override;
@@ -109,9 +114,16 @@ public:
 	void RefreshMass();
 
 	static void MergeDraggable(ADraggableActor* actorA, ADraggableActor* actorB);
-	static void ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActor* snapMover, class UBoxComponent*& out_SnapSocket, class UStaticMeshComponent*& out_SnapComponent);
+	// Return the dist squared of the match
+	static float ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActor* snapMover, class UBoxComponent*& out_SnapSocket, class UStaticMeshComponent*& out_SnapComponent);
 	static void SnapDraggable(class UBoxComponent* snapSocket, class UPrimitiveComponent* snapComponent);
 
 	void GenerateShapeDefinition();
+
+	class UStaticMeshComponent* FindStaticMeshByTag(FString meshTag);
+
+	static FString GetMeshTag(class UPrimitiveComponent* primComp);
+	static FString CreateMeshTag(class UPrimitiveComponent* primComp);
+	static void CopyMeshTag(class UPrimitiveComponent* primCompFrom, class UPrimitiveComponent* primCompTo);
 };
 

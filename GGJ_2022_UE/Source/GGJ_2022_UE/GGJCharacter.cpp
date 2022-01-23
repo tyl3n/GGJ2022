@@ -141,10 +141,12 @@ void AGGJCharacter::TickMergables()
 		{
 			// Newly in zone
 			TouchingDraggableActors.Add(dragActor);
-			EMergeState mergeState = mergeableDraggableActors.Contains(dragActor) ? EMergeState::OnPadAndMergable : EMergeState::OnPadButUnmergable;
+			EMergeState mergeState = GetAssociatedMergeState(dragActor);
 			dragActor->SetMergeState(mergeState);
 		}
 	}
+
+	int mergeableCount = MergeableDraggableActors.Num();
 
 	for (int i = MergeableDraggableActors.Num() - 1; i >= 0; --i)
 	{
@@ -160,13 +162,48 @@ void AGGJCharacter::TickMergables()
 			MergeableDraggableActors.RemoveAt(i);
 		}
 	}
+
 	for (ADraggableActor* dragActor : mergeableDraggableActors)
 	{
 		if (!MergeableDraggableActors.Contains(dragActor))
 		{
 			// Newly mergeable
 			MergeableDraggableActors.Add(dragActor);
-			dragActor->SetMergeState(EMergeState::OnPadAndMergable);
+		}
+	}
+
+	if (MergeableDraggableActors.Num())
+	{
+		for (ADraggableActor * dragActor : MergeableDraggableActors)
+		{
+			dragActor->SetMergeState(GetAssociatedMergeState(dragActor));
+		}
+	}
+}
+
+EMergeState AGGJCharacter::GetAssociatedMergeState(ADraggableActor* actor) const
+{
+	if (MergeableDraggableActors.Contains(actor))
+	{
+		TPair<UBoxComponent*, UStaticMeshComponent*> dummy;
+		if (GetDraggableActorBestMergeMatch(actor, dummy))
+		{
+			return EMergeState::OnPadAndMergable;
+		}
+		else
+		{
+			return EMergeState::OnPadButUnmergable;
+		}
+	}
+	else
+	{
+		if (TouchingDraggableActors.Contains(actor))
+		{
+			return EMergeState::None;
+		}
+		else
+		{
+			return EMergeState::None;
 		}
 	}
 }
@@ -281,6 +318,44 @@ void AGGJCharacter::CheatSpawnResource(int resourceId)
 #endif
 }
 
+bool AGGJCharacter::GetDraggableActorBestMergeMatch(ADraggableActor* draggable, TPair<UBoxComponent*, UStaticMeshComponent*>& out_MergeMatch) const
+{
+	if (draggable == nullptr)
+	{
+		return nullptr;
+	}
+
+	float bestMatchDistSqr = BIG_NUMBER;
+	ADraggableActor* out_ActorMatch = nullptr;
+
+	for (int j = 0; j < MergeableDraggableActors.Num(); ++j)
+	{
+		if (MergeableDraggableActors[j] == draggable || MergeableDraggableActors[j] == nullptr)
+		{
+			// Don't check same piece
+			continue;
+		}
+
+		if (draggable->ResourceID != MergeableDraggableActors[j]->ResourceID)
+		{
+			// not of same type
+			continue;
+		}
+
+		TPair<UBoxComponent*, UStaticMeshComponent*> pair;
+		float distSqr = ADraggableActor::ComputeSnapPair(draggable, MergeableDraggableActors[j], pair.Key, pair.Value);
+
+		if (pair.Key != nullptr && distSqr < bestMatchDistSqr)
+		{
+			bestMatchDistSqr = distSqr;
+			out_ActorMatch = MergeableDraggableActors[j];
+			out_MergeMatch = pair;
+		}
+	}
+
+	return out_ActorMatch != nullptr;
+}
+
 void AGGJCharacter::MergeTouchingDraggableActors()
 {
 	if (MergeableDraggableActors.Num() > 1)
@@ -292,13 +367,13 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 
 		TArray< TPair<UBoxComponent*, UStaticMeshComponent*> > snapPairs;
 
-		for (int i = 0; i < MergeableDraggableActors.Num() - 1; ++i)
+		for (int i = 0; i < MergeableDraggableActors.Num(); ++i)
 		{
-			TPair<UBoxComponent*, UStaticMeshComponent*>& pair = snapPairs.AddZeroed_GetRef();
-			ADraggableActor::ComputeSnapPair(MergeableDraggableActors[i], MergeableDraggableActors[i + 1], pair.Key, pair.Value);
-			if (pair.Key == nullptr)
+			TPair<UBoxComponent*, UStaticMeshComponent*> bestPair;
+
+			if (GetDraggableActorBestMergeMatch(MergeableDraggableActors[i], bestPair))
 			{
-				snapPairs.RemoveAt(snapPairs.Num() - 1);
+				snapPairs.Add(bestPair);
 			}
 		}
 
@@ -306,7 +381,23 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 		{
 			if (snapPair.Value != nullptr)
 			{
-				ADraggableActor::SnapDraggable(snapPair.Key, snapPair.Value);
+				UPrimitiveComponent* snapComponent = snapPair.Value;
+
+				if (ADraggableActor* draggable = Cast<ADraggableActor>(snapComponent->GetOwner()))
+				{
+					ADraggableActor* mergeInto = draggable;
+					while (mergeInto->MergedInto)
+					{
+						mergeInto = mergeInto->MergedInto;
+					}
+
+					if (draggable != mergeInto)
+					{
+						snapComponent = mergeInto->FindStaticMeshByTag(ADraggableActor::GetMeshTag(snapComponent));
+					}
+				}
+
+				ADraggableActor::SnapDraggable(snapPair.Key, snapComponent);
 				ADraggableActor::MergeDraggable(Cast<ADraggableActor>(snapPair.Key->GetOwner()), Cast<ADraggableActor>(snapPair.Value->GetOwner()));
 			}
 		}
