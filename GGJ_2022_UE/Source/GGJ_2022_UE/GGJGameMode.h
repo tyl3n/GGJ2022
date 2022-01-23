@@ -50,9 +50,6 @@ public:
 	void AssignNewObjective(EPlayerDuality duality, float bonusTime = 0.0f);
 
 	void OnShapeSacrifice(class AGGJCharacter* sacrificer, uint32 shapeCode, int resourceID);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FColor GetResourceColor(int resourceID) const;
 };
 
 

@@ -150,9 +150,3 @@ void AGGJGameMode::OnShapeSacrifice(AGGJCharacter* sacrificer, uint32 shapeCode,
 		}
 	}
 }
-
-FColor AGGJGameMode::GetResourceColor_Implementation(int resourceID) const
-{
-	// Implemented in BP
-	return FColor::White;
-}

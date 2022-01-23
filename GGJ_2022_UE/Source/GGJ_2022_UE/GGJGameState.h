@@ -23,9 +23,13 @@ public:
 	TArray<float> ResourcesBalance;
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float deltaTime) override;
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 
 	void AdjustResources(EPlayerDuality duality, int resourceID, float adjustment);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool IsGameCompleted() const;
 
 	AGGJGameState();
 
