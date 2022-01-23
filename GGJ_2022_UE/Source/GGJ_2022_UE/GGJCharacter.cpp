@@ -15,6 +15,8 @@
 #include "GGJWorldSettings.h"
 #include "DraggableActor.h"
 #include "MergeDraggableZone.h"
+#include "GGJGameState.h"
+#include "GGJPlayerState.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGGJCharacter
@@ -59,19 +61,22 @@ void AGGJCharacter::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	if (DraggedActor != nullptr)
+	if(IsLocallyControlled())
 	{
-		FVector mouseLocation, mouseDirection;
-		APlayerController* playerController = Cast<APlayerController>(GetController());
-		playerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+		if (DraggedActor != nullptr)
+		{
+			FVector mouseLocation, mouseDirection;
+			APlayerController* playerController = Cast<APlayerController>(GetController());
+			playerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
 
-		FPlane plane = FPlane(VecZ(DraggedActor->GetDraggableZ()), FVector::UpVector);
-		FVector dragPoint = FMath::RayPlaneIntersection(mouseLocation, mouseDirection, plane);
+			FPlane plane = FPlane(VecZ(DraggedActor->GetDraggableZ()), FVector::UpVector);
+			FVector dragPoint = FMath::RayPlaneIntersection(mouseLocation, mouseDirection, plane);
 
-		DraggedActor->Drag(dragPoint, deltaTime);
-	}
+			DraggedActor->Drag(dragPoint, deltaTime);
+		}
 	
-	TickMergables();
+		TickMergables();
+	}
 }
 
 void AGGJCharacter::TickMergables()
@@ -192,7 +197,7 @@ void AGGJCharacter::SelectPressed()
 	FCollisionResponseParams responseParams;
 	FHitResult selection;
 
-	TWEAKABLE float Distance = 5000.0f;
+	TWEAKABLE float Distance = 10000.0f;
 	world->LineTraceSingleByChannel(selection, mouseLocation, mouseLocation + mouseDirection * Distance, ECC_Draggable, queryParams, responseParams);
 
 	DraggedActor = Cast<ADraggableActor>(selection.Actor);
@@ -252,5 +257,26 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 				ADraggableActor::MergeDraggable(Cast<ADraggableActor>(snapPair.Key->GetOwner()), Cast<ADraggableActor>(snapPair.Value->GetOwner()));
 			}
 		}
+	}
+}
+
+void AGGJCharacter::SacrificePiece_Client(ADraggableActor* piece)
+{
+	if(AGGJPlayerState* playerState = Cast<AGGJPlayerState>(GetPlayerState()))
+	{
+		Server_SacrificePiece(playerState->Duality, 0, piece->StaticMeshes.Num() / 20.0f);
+	}
+
+	if(piece != nullptr)
+	{
+		piece->Destroy();
+	}
+}
+
+void AGGJCharacter::Server_SacrificePiece_Implementation(EPlayerDuality duality, int resourceIndex, float resourceAmount)
+{
+	if (AGGJGameState* gameState = Utils::GetGameState())
+	{
+		gameState->AdjustResources(duality, resourceIndex, resourceAmount);
 	}
 }

@@ -12,8 +12,13 @@
 #include "GGJPlayerController.h"
 #include "GGJPlayerState.h"
 
-UWorld* Utils::GetGameWorld()
+UWorld* Utils::GetGameWorld(UObject* context)
 {
+	if (context != nullptr)
+	{
+		return context->GetWorld();
+	}
+
 	UWorld* theWorld = nullptr;
 
 	if (GEngine != nullptr)
@@ -72,9 +77,9 @@ AGGJWorldSettings* Utils::GetWorldSettings()
 	return Cast<AGGJWorldSettings>(world->GetWorldSettings());
 }
 
-AGGJCharacter* Utils::GetLocalPlayer()
+AGGJCharacter* Utils::GetLocalPlayer(UObject* context)
 {
-	for (TActorIterator<AGGJCharacter> it(GetGameWorld()); it; ++it)
+	for (TActorIterator<AGGJCharacter> it(GetGameWorld(context)); it; ++it)
 	{
 		if(AGGJCharacter* character = *it)
 		{
@@ -88,9 +93,9 @@ AGGJCharacter* Utils::GetLocalPlayer()
 	return nullptr;
 }
 
-AGGJPlayerController* Utils::GetLocalPlayerController()
+AGGJPlayerController* Utils::GetLocalPlayerController(UObject* context)
 {
-	UWorld* theWorld = GetGameWorld();
+	UWorld* theWorld = GetGameWorld(context);
 	if (theWorld == nullptr) // happens e.g. for cases downstack of OnUnregister() called from blueprint compile
 	{
 		return nullptr;
@@ -110,9 +115,9 @@ AGGJPlayerController* Utils::GetLocalPlayerController()
 	return nullptr;
 }
 
-AGGJPlayerState* Utils::GetLocalPlayerState()
+AGGJPlayerState* Utils::GetLocalPlayerState(UObject* context)
 {
-	if(AGGJPlayerController* controller = GetLocalPlayerController())
+	if(AGGJPlayerController* controller = GetLocalPlayerController(context))
 	{
 		return Cast<AGGJPlayerState>(controller->PlayerState);
 	}

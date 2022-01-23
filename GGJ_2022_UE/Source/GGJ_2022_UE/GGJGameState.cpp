@@ -1,10 +1,34 @@
 
 #include "GGJGameState.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "GGJPlayerState.h"
 
 AGGJGameState::AGGJGameState()
 {
+}
+
+void AGGJGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGGJGameState, ResourcesBalance);
+}
+
+void AGGJGameState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ResourcesBalance.SetNum(5);
+
+	if (HasAuthority())
+	{
+		for (int i = 0; i < ResourcesBalance.Num(); ++i)
+		{
+			ResourcesBalance[i] = 0.5f;
+		}
+	}
 }
 
 void AGGJGameState::AddPlayerState(APlayerState* PlayerState)
@@ -39,19 +63,16 @@ void AGGJGameState::AddPlayerState(APlayerState* PlayerState)
 	}
 }
 
-void AGGJGameState::CompleteObjective( TArray<FGGJObjective>& Objectives, TArray<float>& Ressources,  int ObjectiveId
-	, bool SentByServer)
+void AGGJGameState::AdjustResources(EPlayerDuality duality, int resourceIndex, float adjustment)
 {
-	for (FGGJObjective& objective : Objectives)
+	if (ResourcesBalance.IsValidIndex(resourceIndex))
 	{
-		if (objective.ObjectiveId == ObjectiveId)
+		if (duality == EPlayerDuality::Devil)
 		{
-			if (objective.RessourceIndex < Ressources.Num())
-			{
-				float valueModifier = objective.RessourceValue * SentByServer ? -1.0f : 1.0f;
-				Ressources[objective.RessourceIndex] = FMath::Clamp(Ressources[objective.RessourceIndex] + (objective.RessourceValue * valueModifier), 0.0f, 1.0f);
-			}
+			adjustment *= -1.0f;
 		}
+
+		ResourcesBalance[resourceIndex] = FMath::Clamp(ResourcesBalance[resourceIndex] + adjustment, -1.0f, 1.0f);
 	}
 }
 
