@@ -16,6 +16,11 @@ class AGGJCharacter : public ACharacter
 public:
 
 	//////////////////////////////////////////////////////////////////////////
+	/// Config
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class ADraggableActor> CheatSpawnActor;
+
+	//////////////////////////////////////////////////////////////////////////
 	/// Dynamic
 
 	UPROPERTY(Transient)
@@ -38,6 +43,8 @@ protected:
 	void SelectReleased();
 
 	void RotateDraggable(float value);
+
+	void CheatSpawnResource(int resourceId);
 
 public:
 	UFUNCTION(BlueprintCallable)
