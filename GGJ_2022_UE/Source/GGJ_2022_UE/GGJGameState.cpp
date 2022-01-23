@@ -14,7 +14,7 @@ AGGJGameState::AGGJGameState()
 void AGGJGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
+	DOREPLIFETIME(AGGJGameState, GameStatus);
 	DOREPLIFETIME(AGGJGameState, ResourcesBalance);
 }
 
@@ -23,7 +23,7 @@ void AGGJGameState::Tick(float deltaTime)
 	Super::Tick(deltaTime);
 	if (HasAuthority())
 	{
-		IsGameCompleted();
+		CheckIfGameCompleted();
 	}
 }
 
@@ -39,6 +39,7 @@ void AGGJGameState::BeginPlay()
 		{
 			ResourcesBalance[i] = 0.5f;
 		}
+		GameStatus = EGameStatus::Unassigned;
 	}
 }
 
@@ -91,11 +92,11 @@ void AGGJGameState::AdjustResources(EPlayerDuality duality, int resourceID, floa
 	}
 }
 
-bool AGGJGameState::IsGameCompleted_Implementation() const
+bool AGGJGameState::CheckIfGameCompleted()
 {
 	AGGJGameMode* gameMode = Utils::GetGameMode();
 
-	if (gameMode == nullptr)
+	if (gameMode == nullptr || GameStatus != EGameStatus::Unassigned)
 	{
 		return false;
 	}
@@ -104,7 +105,10 @@ bool AGGJGameState::IsGameCompleted_Implementation() const
 	{
 		if (ResourcesBalance[i] <= 0.0f || ResourcesBalance[i] >= 1.0f)
 		{
+			GameStatus = EGameStatus::Lost;
+			OnRep_GameStatus();
 			return true;
+			
 		}	
 	}
 	bool haveAllPlayersFinishedObjectives = true;
@@ -116,8 +120,27 @@ bool AGGJGameState::IsGameCompleted_Implementation() const
 				ggjPlayerStateIt->CompletedObjectives.Num() + ggjPlayerStateIt->FailedObjectives.Num() == gameMode->AvailableMissions.Num());
 		}
 	}
-	return haveAllPlayersFinishedObjectives;
+	if (haveAllPlayersFinishedObjectives) 
+	{
+		GameStatus = EGameStatus::Won;
+		OnRep_GameStatus();
+		return true;
+	}
 
+	return false;
+}
+
+void AGGJGameState::OnRep_GameStatus()
+{
+	if ( GameStatus != EGameStatus::Unassigned)
+	{
+		DoGameCompletionLogic();
+	}
+}
+
+void AGGJGameState::DoGameCompletionLogic_Implementation()
+{
+	
 }
 
 FColor AGGJGameState::GetResourceColor_Implementation(int resourceIndex) const
