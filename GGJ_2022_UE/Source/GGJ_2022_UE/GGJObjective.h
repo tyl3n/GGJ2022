@@ -20,7 +20,7 @@ public:
 	float Duration = 35.0f;
 
 	UPROPERTY(BlueprintReadWrite)
-	int RessourceIndex = 0;
+	int ResourceID = 0;
 
 	UPROPERTY(BlueprintReadWrite)
 	int ObjectiveId = 0;

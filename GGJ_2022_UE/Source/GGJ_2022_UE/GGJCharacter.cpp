@@ -17,6 +17,7 @@
 #include "MergeDraggableZone.h"
 #include "GGJGameState.h"
 #include "GGJPlayerState.h"
+#include "GGJGameMode.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGGJCharacter
@@ -273,10 +274,15 @@ void AGGJCharacter::SacrificePiece_Client(ADraggableActor* piece)
 	}
 }
 
-void AGGJCharacter::Server_SacrificePiece_Implementation(EPlayerDuality duality, int resourceIndex, float resourceAmount, uint32 shapeCode)
+void AGGJCharacter::Server_SacrificePiece_Implementation(EPlayerDuality duality, int resourceID, float resourceAmount, uint32 shapeCode)
 {
 	if (AGGJGameState* gameState = Utils::GetGameState())
 	{
-		gameState->AdjustResources(duality, resourceIndex, resourceAmount);
+		gameState->AdjustResources(duality, resourceID, resourceAmount);
+	}
+
+	if (AGGJGameMode* gameMode = Utils::GetGameMode())
+	{
+		gameMode->OnShapeSacrifice(this, shapeCode, resourceID);
 	}
 }

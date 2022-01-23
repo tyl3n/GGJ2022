@@ -76,6 +76,23 @@ bool AGGJPlayerState::HasObjective(int objectiveId) const
 	return false;
 }
 
+void AGGJPlayerState::CompleteObjective_Server(int objectiveId)
+{
+	for (int i = ActiveObjectives.Num() - 1; i >= 0; --i)
+	{
+		if (ActiveObjectives[i].ObjectiveId == objectiveId)
+		{
+			CompletedObjectives.Add(ActiveObjectives[i]);
+			ActiveObjectives.RemoveAt(i);
+
+			OnRep_ActiveObjectives();
+			FlushNetDormancy();
+
+			return; // DONE
+		}
+	}
+}
+
 void AGGJPlayerState::OnRep_ActiveObjectives()
 {
 	for (FGGJObjective& objective : ActiveObjectives)

@@ -63,20 +63,20 @@ void AGGJGameState::AddPlayerState(APlayerState* PlayerState)
 	}
 }
 
-void AGGJGameState::AdjustResources(EPlayerDuality duality, int resourceIndex, float adjustment)
+void AGGJGameState::AdjustResources(EPlayerDuality duality, int resourceID, float adjustment)
 {
-	if (ResourcesBalance.IsValidIndex(resourceIndex))
+	if (ResourcesBalance.IsValidIndex(resourceID))
 	{
 		if (duality == EPlayerDuality::Devil)
 		{
 			adjustment *= -1.0f;
 		}
 
-		ResourcesBalance[resourceIndex] = FMath::Clamp(ResourcesBalance[resourceIndex] + adjustment, -1.0f, 1.0f);
+		ResourcesBalance[resourceID] = FMath::Clamp(ResourcesBalance[resourceID] + adjustment, -1.0f, 1.0f);
 	}
 }
 
-FColor AGGJGameState::GetResourceColor_Implementation(int resourceIndex) const
+FColor AGGJGameState::GetResourceColor_Implementation(int resourceID) const
 {
 	// Implemented in BP
 	return FColor::White;

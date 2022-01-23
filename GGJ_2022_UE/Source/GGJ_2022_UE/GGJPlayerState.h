@@ -24,7 +24,7 @@ class AGGJPlayerState : public APlayerState
 	GENERATED_BODY()
 public:
 
-	UPROPERTY(Transient, BlueprintReadOnly, Replicated)
+	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing=OnRep_Duality)
 	EPlayerDuality Duality;
 
 	UPROPERTY(Transient, BlueprintReadWrite, ReplicatedUsing=OnRep_ActiveObjectives)
@@ -44,9 +44,16 @@ public:
 	virtual void Tick(float deltaTime) override;
 
 	bool HasObjective(int objectiveId) const;
+	void CompleteObjective_Server(int objectiveId);
 
 	UFUNCTION()
 	void OnRep_ActiveObjectives();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDualityChanged();
+
+	UFUNCTION()
+	void OnRep_Duality() { OnDualityChanged(); }
 };
 
 

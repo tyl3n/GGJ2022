@@ -46,7 +46,7 @@ public:
 	void SacrificePiece_Client(class ADraggableActor* piece);
 
 	UFUNCTION(Server, Reliable)
-	void Server_SacrificePiece(EPlayerDuality duality, int resourceIndex, float resourceAmount);
+	void Server_SacrificePiece(EPlayerDuality duality, int resourceID, float resourceAmount, uint32 shapeCode);
 	
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

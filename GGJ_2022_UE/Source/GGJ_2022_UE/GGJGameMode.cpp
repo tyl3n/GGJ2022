@@ -5,6 +5,7 @@
 #include "GGJPlayerState.h"
 #include "Utilities.h"
 #include "GGJWorldSettings.h"
+#include "GGJCharacter.h"
 
 AGGJGameMode::AGGJGameMode()
 {
@@ -32,7 +33,7 @@ void AGGJGameMode::BeginPlay()
 			for (int i = 0; i < AvailableMissions.Num(); ++i)
 			{
 				AvailableMissions[i].ObjectiveId = i;
-				AvailableMissions[i].RessourceIndex = randomStream.RandRange(0, 4);
+				AvailableMissions[i].ResourceID = randomStream.RandRange(0, 4);
 			}
 
 			for (int i = 0; i < worldSettings->NumberOfInitialMission; ++i)
@@ -128,8 +129,29 @@ void AGGJGameMode::AssignNewObjective(EPlayerDuality duality, float bonusTime)
 	}
 }
 
+void AGGJGameMode::OnShapeSacrifice(AGGJCharacter* sacrificer, uint32 shapeCode, int resourceID)
+{
+	if (sacrificer != nullptr)
+	{
+		if (AGGJPlayerState* playerState = Cast<AGGJPlayerState>(sacrificer->GetPlayerState()))
+		{
+			for (int i = playerState->ActiveObjectives.Num() - 1; i >= 0; --i)
+			{
+				const FGGJObjective& objective = playerState->ActiveObjectives[i];
 
-FColor AGGJGameMode::GetResourceColor_Implementation(int resourceIndex) const
+				if(objective.ResourceID == resourceID)
+				{
+					if (FGGJShapeDefinition::ShapeCodesMatch(objective.ShapeCode, shapeCode))
+					{
+						playerState->CompleteObjective_Server(objective.ObjectiveId);
+					}
+				}
+			}
+		}
+	}
+}
+
+FColor AGGJGameMode::GetResourceColor_Implementation(int resourceID) const
 {
 	// Implemented in BP
 	return FColor::White;

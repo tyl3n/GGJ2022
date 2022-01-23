@@ -235,6 +235,24 @@ void FGGJShapeDefinition::GetNeighbors(int x, int y, TArray< TPair<int, int> >& 
 	}
 }
 
+bool FGGJShapeDefinition::ShapeCodesMatch(uint32 codeA, uint32 codeB)
+{
+	// All 4 rotations
+	for (int i = 0; i < 4; ++i)
+	{
+		if (codeA == codeB)
+		{
+			return true;
+		}
+
+		FGGJShapeDefinition rotatedCW = FGGJShapeDefinition(codeB);
+		rotatedCW.RotateCW();
+		codeB = rotatedCW.ToUInt32();
+	}
+
+	return false;
+}
+
 uint32 FGGJShapeDefinition::ToUInt32() const
 {
 	uint32 output = 0;

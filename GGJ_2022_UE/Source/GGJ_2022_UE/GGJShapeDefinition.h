@@ -32,6 +32,8 @@ public:
 	static FGGJShapeDefinition GenerateShape(int seed, int shapeSize);
 	static void GetNeighbors(int x, int y, TArray< TPair<int, int> >& out_NeighborCoords);
 
+	static bool ShapeCodesMatch(uint32 codeA, uint32 codeB);
+
 	uint32 ToUInt32() const;
 	FString ToString() const;
 };

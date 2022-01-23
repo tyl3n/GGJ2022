@@ -25,12 +25,12 @@ public:
 	virtual void BeginPlay() override;
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 
-	void AdjustResources(EPlayerDuality duality, int resourceIndex, float adjustment);
+	void AdjustResources(EPlayerDuality duality, int resourceID, float adjustment);
 
 	AGGJGameState();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FColor GetResourceColor(int resourceIndex) const;
+	FColor GetResourceColor(int resourceID) const;
 };
 
 
