@@ -56,6 +56,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FColor DrawLineColor = FColor::Black;
 
+	UPROPERTY(BlueprintReadWrite)
+	int RessourceID = 0;
+
 	UPROPERTY(BlueprintReadOnly)
 	bool bDraging = false;
 
