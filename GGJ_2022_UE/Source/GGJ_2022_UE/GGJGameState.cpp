@@ -4,7 +4,9 @@
 #include "Net/UnrealNetwork.h"
 
 #include "GGJPlayerState.h"
+#include "GGJGameMode.h"
 
+#include "Utilities.h"
 AGGJGameState::AGGJGameState()
 {
 }
@@ -15,7 +17,14 @@ void AGGJGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutL
 
 	DOREPLIFETIME(AGGJGameState, ResourcesBalance);
 }
-
+void AGGJGameState::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
+	if (HasAuthority())
+	{
+		IsGameCompleted();
+	}
+}
 void AGGJGameState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -75,7 +84,34 @@ void AGGJGameState::AdjustResources(EPlayerDuality duality, int resourceIndex, f
 		ResourcesBalance[resourceIndex] = FMath::Clamp(ResourcesBalance[resourceIndex] + adjustment, -1.0f, 1.0f);
 	}
 }
+bool AGGJGameState::IsGameCompleted_Implementation() const
+{
+	AGGJGameMode* gameMode = Utils::GetGameMode();
 
+	if (gameMode == nullptr)
+	{
+		return false;
+	}
+
+	for (int i = 0; i < ResourcesBalance.Num(); ++i)
+	{
+		if (ResourcesBalance[i] <= 0.0f || ResourcesBalance[i] >= 1.0f)
+		{
+			return true;
+		}	
+	}
+	bool haveAllPlayersFinishedObjectives = true;
+	for (APlayerState* playerState : PlayerArray)
+	{
+		if (AGGJPlayerState* ggjPlayerStateIt = Cast<AGGJPlayerState>(playerState))
+		{
+			haveAllPlayersFinishedObjectives &= (ggjPlayerStateIt->ActiveObjectives.Num() == 0 &&
+				ggjPlayerStateIt->CompletedObjectives.Num() + ggjPlayerStateIt->FailedObjectives.Num() == gameMode->AvailableMissions.Num());
+		}
+	}
+	return haveAllPlayersFinishedObjectives;
+
+}
 FColor AGGJGameState::GetResourceColor_Implementation(int resourceIndex) const
 {
 	// Implemented in BP

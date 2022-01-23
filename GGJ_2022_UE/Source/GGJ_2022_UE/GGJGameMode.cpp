@@ -128,7 +128,6 @@ void AGGJGameMode::AssignNewObjective(EPlayerDuality duality, float bonusTime)
 	}
 }
 
-
 FColor AGGJGameMode::GetResourceColor_Implementation(int resourceIndex) const
 {
 	// Implemented in BP
