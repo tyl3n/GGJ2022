@@ -19,6 +19,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="GGJ")
 	TSoftObjectPtr<class ACameraActor> LevelCamera;
 
+	UPROPERTY(EditAnywhere, Category = "GGJ")
+	float WorldZ = 185.0f;
+
 	UPROPERTY(EditAnywhere)
 	int NumberOfInitialMission = 3;
 
