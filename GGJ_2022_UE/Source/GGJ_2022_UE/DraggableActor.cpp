@@ -8,6 +8,7 @@
 #include "Engine/World.h"
 
 #include "Utilities.h"
+#include "GGJShapeDefinition.h"
 
 ADraggableActor::ADraggableActor()
 {
@@ -19,6 +20,15 @@ void ADraggableActor::BeginPlay()
 
 	RefreshComponents();
 	RefreshMass();
+
+	for (UStaticMeshComponent* staticMesh : StaticMeshes)
+	{
+		if (staticMesh->GetAttachParent() == nullptr)
+		{
+			MasterStaticMesh = staticMesh;
+			break;
+		}
+	}
 
 	for (UBoxComponent* boxCOmp : BoxComponents)
 	{
@@ -57,9 +67,9 @@ void ADraggableActor::OnDragged_Implementation(float length)
 
 void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 {
-	if (UStaticMeshComponent* staticMesh = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass())))
+	if (MasterStaticMesh != nullptr)
 	{
-		FVector location = staticMesh->GetComponentLocation();
+		FVector location = MasterStaticMesh->GetComponentLocation();
 		FVector dragVector = Vec2D(dragPoint - location);
 
 		FVector dragDir;
@@ -74,7 +84,7 @@ void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 
 		FVector force = dragDir * (forceStrength  - (DragSprintMultiplier * dragLength * springMultiplier));
 
-		staticMesh->AddForce(force);
+		MasterStaticMesh->AddForce(force);
 
 		OnDragged(dragLength);
 
@@ -85,9 +95,9 @@ void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 
 float ADraggableActor::GetDraggableZ() const
 {
-	if (UStaticMeshComponent* staticMesh = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass())))
+	if (MasterStaticMesh != nullptr)
 	{
-		return staticMesh->GetComponentLocation().Z;
+		return MasterStaticMesh->GetComponentLocation().Z;
 	}
 
 	return 0.0f;
@@ -95,9 +105,9 @@ float ADraggableActor::GetDraggableZ() const
 
 void ADraggableActor::Rotate(float dirSign)
 {
-	if (UStaticMeshComponent* staticMesh = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass())))
+	if (MasterStaticMesh != nullptr)
 	{
-		staticMesh->AddAngularImpulseInRadians(FVector(dirSign * RotateMultiplier, dirSign * RotateMultiplier, dirSign * RotateMultiplier) * StaticMeshes.Num(), NAME_None, RotateAsVelChange);
+		MasterStaticMesh->AddAngularImpulseInRadians(FVector(dirSign * RotateMultiplier, dirSign * RotateMultiplier, dirSign * RotateMultiplier) * StaticMeshes.Num(), NAME_None, RotateAsVelChange);
 	}
 }
 
@@ -141,7 +151,7 @@ void ADraggableActor::MergeDraggable(ADraggableActor* actorA, ADraggableActor* a
 {
 	if (ensure(actorA != nullptr && actorB != nullptr))
 	{
-		if (UStaticMeshComponent* staticMesh = Cast<UStaticMeshComponent>(actorA->GetComponentByClass(UStaticMeshComponent::StaticClass())))
+		if (actorA->MasterStaticMesh != nullptr)
 		{
 			for (UActorComponent* component : actorB->GetComponents())
 			{
@@ -149,7 +159,7 @@ void ADraggableActor::MergeDraggable(ADraggableActor* actorA, ADraggableActor* a
 				{
 					UStaticMeshComponent* actorComponent = NewObject<UStaticMeshComponent>(actorA);
 					actorComponent->OnComponentCreated();
-					actorComponent->SetupAttachment(staticMesh);
+					actorComponent->SetupAttachment(actorA->MasterStaticMesh);
 					actorComponent->SetMobility(EComponentMobility::Movable);
 					actorComponent->SetCollisionProfileName(primComp->GetCollisionProfileName());
 					actorComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -164,7 +174,7 @@ void ADraggableActor::MergeDraggable(ADraggableActor* actorA, ADraggableActor* a
 				{
 					UBoxComponent* actorComponent = NewObject<UBoxComponent>(actorA);
 					actorComponent->OnComponentCreated();
-					actorComponent->SetupAttachment(staticMesh);
+					actorComponent->SetupAttachment(actorA->MasterStaticMesh);
 					actorComponent->SetMobility(EComponentMobility::Movable);
 					actorComponent->SetBoxExtent(boxComp->GetScaledBoxExtent());
 					actorComponent->SetCollisionObjectType(boxComp->GetCollisionObjectType());
@@ -253,4 +263,52 @@ void ADraggableActor::SnapDraggable(class UBoxComponent* snapSocket, class UPrim
 	{
 		snapComponent->GetAttachParent()->SetWorldTransform(FTransform(snapSocketQuat, snapSocketLocation, snapSocketScale));
 	}
+}
+
+FGGJShapeDefinition ADraggableActor::ConvertToShapeDefinition()
+{
+	int minX = 1000;
+	int minY = 1000;
+	TArray< TPair<int, int> > coords;
+
+	for (UStaticMeshComponent* staticMesh : StaticMeshes)
+	{
+		TPair<int, int>& coord = coords.AddZeroed_GetRef();
+		if (staticMesh->GetAttachParent() == nullptr)
+		{
+			coord.Key = 0;
+			coord.Value = 0;
+		}
+		else
+		{
+			FVector relativeLocation = staticMesh->GetRelativeLocation();
+			coord.Key = FMath::RoundToInt(relativeLocation.X / 100.0f);
+			coord.Value = FMath::RoundToInt(relativeLocation.Y / 100.0f);
+		}
+
+		if (coord.Key < minX)
+		{
+			minX = coord.Key;
+		}
+
+		if (coord.Value < minY)
+		{
+			minY = coord.Value;
+		}
+	}
+
+	for (TPair<int, int>& coord : coords)
+	{
+		coord.Key -= minX;
+		coord.Value -= minY;
+	}
+
+	FGGJShapeDefinition shapeDefinition = FGGJShapeDefinition();
+
+	for (TPair<int, int>& coord : coords)
+	{
+		shapeDefinition.SetShapeValue(coord.Key, coord.Value, true);
+	}
+
+	return shapeDefinition;
 }
