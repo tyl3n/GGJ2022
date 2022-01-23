@@ -259,6 +259,7 @@ void AGGJCharacter::RotateDraggable(float value)
 
 void AGGJCharacter::CheatSpawnResource(int resourceId)
 {
+#if !UE_BUILD_SHIPPING
 	if (resourceId < 0 || resourceId > 4)
 	{
 		resourceId = FMath::RandRange(0, 4);
@@ -277,6 +278,7 @@ void AGGJCharacter::CheatSpawnResource(int resourceId)
 	ADraggableActor* cheatActor = GetWorld()->SpawnActorDeferred<ADraggableActor>(CheatSpawnActor, transform, nullptr, this, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	cheatActor->ResourceID = resourceId;
 	UGameplayStatics::FinishSpawningActor(cheatActor, transform);
+#endif
 }
 
 void AGGJCharacter::MergeTouchingDraggableActors()
