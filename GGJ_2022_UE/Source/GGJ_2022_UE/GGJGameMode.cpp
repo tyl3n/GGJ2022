@@ -4,6 +4,7 @@
 #include "GGJGameState.h"
 #include "GGJPlayerState.h"
 #include "Utilities.h"
+#include "GGJWorldSettings.h"
 
 AGGJGameMode::AGGJGameMode()
 {
@@ -17,26 +18,28 @@ void AGGJGameMode::BeginPlay()
 
 	RandomSeed = FMath::RandRange(0, 99999999);
 
-	if(ObjectiveDefinitions.Num() > 0)
+	if (AGGJWorldSettings* worldSettings = Utils::GetWorldSettings())
 	{
+		FRandomStream randomStream = FRandomStream(RandomSeed);
+
+		MissionsInterval = worldSettings->MissionsInterval;
+		TWEAKABLE float EPSILON = 0.001f;
+		LastMissionAssignTimestamp = Utils::GetGameTime() + EPSILON;
+		AvailableMissions = worldSettings->ObjectiveDefinitions;
+
+		if (AvailableMissions.Num() > 0)
 		{
-			FGGJObjective& angleObjective = DesiredAngelObjectives.AddZeroed_GetRef();
-			angleObjective = ObjectiveDefinitions[0];
-			angleObjective.GenerateShape(RandomSeed);
+			for (int i = 0; i < AvailableMissions.Num(); ++i)
+			{
+				AvailableMissions[i].ObjectiveId = i;
+				AvailableMissions[i].RessourceIndex = randomStream.RandRange(0, 4);
+			}
 
-			FGGJObjective& devilObjective = DesiredDevilObjectives.AddZeroed_GetRef();
-			devilObjective = ObjectiveDefinitions[0];
-			devilObjective.GenerateShape(RandomSeed);
-		}
-
-		{
-			FGGJObjective& angleObjective = DesiredAngelObjectives.AddZeroed_GetRef();
-			angleObjective = ObjectiveDefinitions[1];
-			angleObjective.GenerateShape(RandomSeed);
-
-			FGGJObjective& devilObjective = DesiredDevilObjectives.AddZeroed_GetRef();
-			devilObjective = ObjectiveDefinitions[1];
-			devilObjective.GenerateShape(RandomSeed);
+			for (int i = 0; i < worldSettings->NumberOfInitialMission; ++i)
+			{
+				AssignNewObjective(EPlayerDuality::Angel, worldSettings->InitialBonusTime.IsValidIndex(i) ? worldSettings->InitialBonusTime[i] : 0.0f);
+				AssignNewObjective(EPlayerDuality::Devil, worldSettings->InitialBonusTime.IsValidIndex(i) ? worldSettings->InitialBonusTime[i] : 0.0f);
+			}
 		}
 	}
 }
@@ -45,15 +48,24 @@ void AGGJGameMode::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
+	if (!Utils::IsRecentEvent(LastMissionAssignTimestamp, MissionsInterval))
+	{
+		AssignNewObjective(EPlayerDuality::Angel);
+		AssignNewObjective(EPlayerDuality::Devil);
+
+		LastMissionAssignTimestamp = Utils::GetGameTime();
+	}
+
 	if (AGGJGameState* gameState = Utils::GetGameState())
 	{
 		for (APlayerState* playerState : gameState->PlayerArray)
 		{
 			if (AGGJPlayerState* ggjPlayerState = Cast<AGGJPlayerState>(playerState))
 			{
-				if (ggjPlayerState->Duality == EPlayerDuality::Angel)
+				if(ggjPlayerState->ActiveObjectives.Num() < MaxConcurrentObjectives)
 				{
-					for (const FGGJObjective& objective : DesiredAngelObjectives)
+					TArray<FGGJObjective>& desiredObjectives = (ggjPlayerState->Duality == EPlayerDuality::Angel) ? DesiredAngelObjectives : DesiredDevilObjectives;
+					for (const FGGJObjective& objective : desiredObjectives)
 					{
 						if (!ggjPlayerState->HasObjective(objective.ObjectiveId))
 						{
@@ -61,22 +73,58 @@ void AGGJGameMode::Tick(float deltaTime)
 							ggjPlayerState->OnRep_ActiveObjectives();
 							ggjPlayerState->FlushNetDormancy();
 						}
-					}
-				}
-				else if (ggjPlayerState->Duality == EPlayerDuality::Devil)
-				{
-					for (const FGGJObjective& objective : DesiredDevilObjectives)
-					{
-						if (!ggjPlayerState->HasObjective(objective.ObjectiveId))
+
+						if (ggjPlayerState->ActiveObjectives.Num() >= MaxConcurrentObjectives)
 						{
-							ggjPlayerState->ActiveObjectives.Add(objective);
-							ggjPlayerState->OnRep_ActiveObjectives();
-							ggjPlayerState->FlushNetDormancy();
+							break;
 						}
 					}
 				}
 			}
 		}
+	}
+
+
+}
+
+
+void AGGJGameMode::GetAvailableMissionIndices(EPlayerDuality duality, TArray<int>& out_MissionIndices) const
+{
+	const TArray<FGGJObjective>& desiredMission = (duality == EPlayerDuality::Angel) ? DesiredAngelObjectives : DesiredDevilObjectives;
+	for (int i = 0; i < AvailableMissions.Num(); ++i)
+	{
+		bool bAlreadyInList = false;
+
+		for (const FGGJObjective& objective : desiredMission)
+		{
+			if (objective.ObjectiveId == i)
+			{
+				bAlreadyInList = true;
+				break;
+			}
+		}
+
+		if (!bAlreadyInList)
+		{
+			out_MissionIndices.Add(i);
+		}
+	}
+}
+
+void AGGJGameMode::AssignNewObjective(EPlayerDuality duality, float bonusTime)
+{
+	TArray<int> availableMissions;
+	GetAvailableMissionIndices(duality, availableMissions);
+
+	if (availableMissions.Num() > 0)
+	{
+		TArray<FGGJObjective>& desiredMission = (duality == EPlayerDuality::Angel) ? DesiredAngelObjectives : DesiredDevilObjectives;
+
+		int availableMissionsIdx = FMath::RandRange(0, availableMissions.Num() - 1);
+		FGGJObjective& newObjective = desiredMission.AddZeroed_GetRef();
+		newObjective = AvailableMissions[availableMissions[availableMissionsIdx]];
+		newObjective.Duration += bonusTime;
+		newObjective.GenerateShape(RandomSeed);
 	}
 }
 

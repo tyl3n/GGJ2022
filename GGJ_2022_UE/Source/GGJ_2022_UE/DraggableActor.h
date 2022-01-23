@@ -56,7 +56,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FColor DrawLineColor = FColor::Black;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int RessourceID = 0;
 
 	UPROPERTY(BlueprintReadOnly)

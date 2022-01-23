@@ -24,8 +24,6 @@ class AGGJPlayerState : public APlayerState
 	GENERATED_BODY()
 public:
 
-	AGGJPlayerState();
-
 	UPROPERTY(Transient, BlueprintReadOnly, Replicated)
 	EPlayerDuality Duality;
 
@@ -35,13 +33,20 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly, Replicated)
 	TArray<FGGJObjective> CompletedObjectives;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Replicated)
+	TArray<FGGJObjective> FailedObjectives;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStateEvent OnActiveObjectiveChanged;
+
+	AGGJPlayerState();
+
+	virtual void Tick(float deltaTime) override;
 
 	bool HasObjective(int objectiveId) const;
 
 	UFUNCTION()
-	void OnRep_ActiveObjectives() { OnActiveObjectiveChanged.Broadcast(this); }
+	void OnRep_ActiveObjectives();
 };
 
 

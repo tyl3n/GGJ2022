@@ -24,6 +24,16 @@ void UGGJBlueprintLibrary::TriggerMerge(UObject* context)
 	}
 }
 
+float UGGJBlueprintLibrary::GetGameTime()
+{
+	return Utils::GetGameTime();
+}
+
+float UGGJBlueprintLibrary::GetElapsedGameTime(float timestamp)
+{
+	return Utils::ElapsedTime(timestamp);
+}
+
 bool UGGJBlueprintLibrary::GetShapeDefinitionValue(const FGGJShapeDefinition& shapeDefinition, int x, int y)
 {
 	return shapeDefinition.GetShapeValue(x, y);

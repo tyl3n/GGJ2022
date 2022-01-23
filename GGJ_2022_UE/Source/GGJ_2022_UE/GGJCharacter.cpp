@@ -264,7 +264,7 @@ void AGGJCharacter::SacrificePiece_Client(ADraggableActor* piece)
 {
 	if(AGGJPlayerState* playerState = Cast<AGGJPlayerState>(GetPlayerState()))
 	{
-		Server_SacrificePiece(playerState->Duality, 0, piece->StaticMeshes.Num() / 20.0f);
+		Server_SacrificePiece(playerState->Duality, piece->RessourceID, piece->StaticMeshes.Num() / 20.0f);
 	}
 
 	if(piece != nullptr)

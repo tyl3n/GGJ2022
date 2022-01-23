@@ -4,3 +4,8 @@
 AGGJWorldSettings::AGGJWorldSettings()
 {
 }
+
+void AGGJWorldSettings::BeginPlay()
+{
+	Super::BeginPlay();
+}

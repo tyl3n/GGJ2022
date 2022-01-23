@@ -14,19 +14,19 @@ struct FGGJObjective
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RessourceValue = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int RessourceIndex = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int RessourceBlockCount = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ObjectiveId = 0;
+	float Duration = 35.0f;
 
 	UPROPERTY(BlueprintReadWrite)
-	bool IsCompleted = false;
+	int RessourceIndex = 0;
+
+	UPROPERTY(BlueprintReadWrite)
+	int ObjectiveId = 0;
+
+	UPROPERTY(NotReplicated, BlueprintReadOnly)
+	float AddedTimestamp = -1.0f;
 
 	uint32 ShapeCode;
 

@@ -20,6 +20,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GGJ|Getters")
 	static class AGGJPlayerState* GetLocalPlayerState(UObject* context);
 
+	UFUNCTION(BlueprintPure, Category = "GGJ|Getters")
+	static float GetGameTime();
+
+	UFUNCTION(BlueprintPure, Category = "GGJ|Getters")
+	static float GetElapsedGameTime(float timestamp);
+
 	UFUNCTION(BlueprintCallable, Category="GGJ")
 	static void TriggerMerge(UObject* context);
 
