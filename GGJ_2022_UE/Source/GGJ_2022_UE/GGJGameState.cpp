@@ -1,11 +1,42 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GGJGameState.h"
-#include "UObject/ConstructorHelpers.h"
-#include "Math/UnrealMathUtility.h"
+
+#include "GGJPlayerState.h"
 
 AGGJGameState::AGGJGameState()
 {
+}
+
+void AGGJGameState::AddPlayerState(APlayerState* PlayerState)
+{
+	Super::AddPlayerState(PlayerState);
+
+	if (AGGJPlayerState* ggjPlayerState = Cast<AGGJPlayerState>(PlayerState))
+	{
+		bool bHasDevilPlayer = false;
+
+		for (APlayerState* playerState : PlayerArray)
+		{
+			if (AGGJPlayerState* ggjPlayerStateIt = Cast<AGGJPlayerState>(playerState))
+			{
+				if (ggjPlayerStateIt->Duality == EPlayerDuality::Devil)
+				{
+					bHasDevilPlayer = true;
+				}
+			}
+		}
+
+		if (bHasDevilPlayer)
+		{
+			ggjPlayerState->Duality = EPlayerDuality::Angel;
+		}
+		else
+		{
+			ggjPlayerState->Duality = EPlayerDuality::Devil;
+		}
+
+		FlushNetDormancy();
+	}
 }
 
 void AGGJGameState::CompleteObjective( TArray<FGGJObjective>& Objectives, TArray<float>& Ressources,  int ObjectiveId
@@ -22,4 +53,10 @@ void AGGJGameState::CompleteObjective( TArray<FGGJObjective>& Objectives, TArray
 			}
 		}
 	}
+}
+
+FColor AGGJGameState::GetResourceColor_Implementation(int resourceIndex) const
+{
+	// Implemented in BP
+	return FColor::White;
 }

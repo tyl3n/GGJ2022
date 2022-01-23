@@ -8,6 +8,9 @@
 #include "GGJGameMode.h"
 #include "GGJWorldSettings.h"
 #include "GGJCharacter.h"
+#include "GGJGameState.h"
+#include "GGJPlayerController.h"
+#include "GGJPlayerState.h"
 
 UWorld* Utils::GetGameWorld()
 {
@@ -32,12 +35,12 @@ UWorld* Utils::GetGameWorld()
 	return theWorld;
 }
 
-AGameStateBase* Utils::GetBaseGameState()
+AGGJGameState* Utils::GetGameState()
 {
 	UWorld* world = GetGameWorld();
 	if (world != nullptr)
 	{
-		return world->GetGameState();
+		return Cast<AGGJGameState>(world->GetGameState());
 	}
 	else
 	{
@@ -85,6 +88,37 @@ AGGJCharacter* Utils::GetLocalPlayer()
 	return nullptr;
 }
 
+AGGJPlayerController* Utils::GetLocalPlayerController()
+{
+	UWorld* theWorld = GetGameWorld();
+	if (theWorld == nullptr) // happens e.g. for cases downstack of OnUnregister() called from blueprint compile
+	{
+		return nullptr;
+	}
+
+	for (FConstPlayerControllerIterator Iterator = theWorld->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		if(AGGJPlayerController* ggjPC = Cast<AGGJPlayerController>(Iterator->Get()))
+		{
+			if (ggjPC->IsLocalController())
+			{
+				return ggjPC;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+AGGJPlayerState* Utils::GetLocalPlayerState()
+{
+	if(AGGJPlayerController* controller = GetLocalPlayerController())
+	{
+		return Cast<AGGJPlayerState>(controller->PlayerState);
+	}
+
+	return nullptr;
+}
 
 float Utils::GetGameTime()
 {

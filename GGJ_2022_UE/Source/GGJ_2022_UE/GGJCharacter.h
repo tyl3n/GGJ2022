@@ -40,14 +40,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MergeTouchingDraggableActors();
 	
-protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
-
-private:
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly)
 	class ADraggableActor* DraggedActor = nullptr;
 };
 

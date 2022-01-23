@@ -199,7 +199,7 @@ void AGGJCharacter::SelectPressed()
 
 	if (DraggedActor != nullptr)
 	{
-		DraggedActor->OnDraggableSelected();
+		DraggedActor->OnDraggableSelected(selection.ImpactPoint);
 	}
 }
 

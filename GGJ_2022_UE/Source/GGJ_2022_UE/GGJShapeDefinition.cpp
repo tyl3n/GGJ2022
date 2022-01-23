@@ -14,6 +14,11 @@ FGGJShapeDefinition::FGGJShapeDefinition(const FString& string)
 	MakeFromString(string);
 }
 
+FGGJShapeDefinition::FGGJShapeDefinition(uint32 code)
+{
+	ShapeArray.SetNumZeroed(25);
+	MakeFromUInt32(code);
+}
 
 FGGJShapeDefinition::~FGGJShapeDefinition()
 {
@@ -34,6 +39,15 @@ void FGGJShapeDefinition::MakeFromString(const FString& string)
 		{
 			ShapeArray[idx++] = false;
 		}
+	}
+}
+
+void FGGJShapeDefinition::MakeFromUInt32(uint32 code)
+{
+	for (int i = 0; i < 25; ++i)
+	{
+		ShapeArray[24 - i] = code & 1;
+		code = code >> 1;
 	}
 }
 
@@ -150,6 +164,75 @@ bool FGGJShapeDefinition::Matches(const FGGJShapeDefinition& otherShape) const
 	}
 
 	return false;
+}
+
+FGGJShapeDefinition FGGJShapeDefinition::GenerateShape(int seed, int shapeSize)
+{
+	FRandomStream random = FRandomStream(seed);
+
+	shapeSize = FMath::Min(shapeSize, 25);
+
+	TArray< TPair<int, int> > shapeCoords;
+	TArray< TPair<int, int> > availableCoords;
+
+	TPair<int, int>& initialCoord = availableCoords.AddZeroed_GetRef();
+	initialCoord.Key = random.RandRange(0, 4);
+	initialCoord.Value = random.RandRange(0, 4);
+
+	while (shapeCoords.Num() < shapeSize && availableCoords.Num() > 0)
+	{
+		int nextIdx = random.RandRange(0, availableCoords.Num() - 1);
+
+		TPair<int, int>& coord = availableCoords[nextIdx];
+
+		TPair<int, int>& newCoord = shapeCoords.AddZeroed_GetRef();
+		newCoord = coord;
+
+		availableCoords.RemoveAt(nextIdx);
+
+		TArray< TPair<int, int> > neighborCoords;
+		GetNeighbors(newCoord.Key, newCoord.Value, neighborCoords);
+
+		for (const TPair<int, int>& neighborCoord : neighborCoords)
+		{
+			if (!shapeCoords.Contains(neighborCoord))
+			{
+				availableCoords.AddUnique(neighborCoord);
+			}
+		}
+	}
+
+	FGGJShapeDefinition shapeDefinition;
+	for (const TPair<int, int>& coord : shapeCoords)
+	{
+		shapeDefinition.SetShapeValue(coord.Key, coord.Value, true);
+	}
+	shapeDefinition.PackShapeValues();
+
+	return shapeDefinition;
+}
+
+void FGGJShapeDefinition::GetNeighbors(int x, int y, TArray< TPair<int, int> >& out_NeighborCoords)
+{
+	if (y > 0)
+	{
+		out_NeighborCoords.Add(TPair<int, int>(x, y - 1));
+	}
+
+	if (y < 4)
+	{
+		out_NeighborCoords.Add(TPair<int, int>(x, y + 1));
+	}
+
+	if (x > 0)
+	{
+		out_NeighborCoords.Add(TPair<int, int>(x - 1, y));
+	}
+
+	if (x < 4)
+	{
+		out_NeighborCoords.Add(TPair<int, int>(x + 1, y));
+	}
 }
 
 uint32 FGGJShapeDefinition::ToUInt32() const

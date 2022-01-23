@@ -48,6 +48,8 @@ public:
 	////////////////////////////////////////
 	/// Dynamic
 
+	FVector RelativeDragPoint;
+
 	UPROPERTY(BlueprintReadWrite)
 	FColor Color = FColor::Yellow;
 
@@ -59,6 +61,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	EMergeState MergeState;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGGJShapeDefinition ShapeDefinition;
 
 	float ReleasedTimestamp;
 
@@ -76,7 +81,7 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintNativeEvent)
-	void OnDraggableSelected();
+	void OnDraggableSelected(const FVector& dragPoint);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDraggableReleased();
@@ -104,6 +109,6 @@ public:
 	static void ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActor* snapMover, class UBoxComponent*& out_SnapSocket, class UStaticMeshComponent*& out_SnapComponent);
 	static void SnapDraggable(class UBoxComponent* snapSocket, class UPrimitiveComponent* snapComponent);
 
-	FGGJShapeDefinition ConvertToShapeDefinition();
+	void GenerateShapeDefinition();
 };
 

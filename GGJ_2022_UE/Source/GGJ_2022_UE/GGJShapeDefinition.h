@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GGJShapeDefinition.generated.h"
 
-USTRUCT(Blueprintable)
+USTRUCT(BlueprintType)
 struct FGGJShapeDefinition 
 {
 	GENERATED_BODY()
@@ -16,9 +16,11 @@ public:
 
 	FGGJShapeDefinition();
 	FGGJShapeDefinition(const FString& string);
+	FGGJShapeDefinition(uint32 code);
 	~FGGJShapeDefinition();
 
 	void MakeFromString(const FString& string);
+	void MakeFromUInt32(uint32 code);
 	bool GetShapeValue(int x, int y) const;
 	void SetShapeValue(int x, int y, bool shapeValue);
 
@@ -27,6 +29,9 @@ public:
 
 	bool Matches(const FGGJShapeDefinition& otherShape) const;
 	
+	static FGGJShapeDefinition GenerateShape(int seed, int shapeSize);
+	static void GetNeighbors(int x, int y, TArray< TPair<int, int> >& out_NeighborCoords);
+
 	uint32 ToUInt32() const;
 	FString ToString() const;
 };

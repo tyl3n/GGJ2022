@@ -49,9 +49,12 @@ void ADraggableActor::SetMergeState(EMergeState newMergeState)
 	}
 }
 
-void ADraggableActor::OnDraggableSelected_Implementation()
+void ADraggableActor::OnDraggableSelected_Implementation(const FVector& dragPoint)
 {
-
+	if(MasterStaticMesh != nullptr)
+	{
+		RelativeDragPoint = MasterStaticMesh->GetComponentTransform().InverseTransformPosition(dragPoint);
+	}
 }
 
 void ADraggableActor::OnDraggableReleased_Implementation()
@@ -69,7 +72,7 @@ void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 {
 	if (MasterStaticMesh != nullptr)
 	{
-		FVector location = MasterStaticMesh->GetComponentLocation();
+		FVector location = MasterStaticMesh->GetComponentTransform().TransformPosition(RelativeDragPoint);
 		FVector dragVector = Vec2D(dragPoint - location);
 
 		FVector dragDir;
@@ -89,7 +92,7 @@ void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 		OnDragged(dragLength);
 
 
-		GetWorld()->LineBatcher->DrawLine(location, dragPoint, DrawLineColor, SDPG_World, DragLineThickness);
+		GetWorld()->LineBatcher->DrawLine(Vec2D(location) + VecZ(MasterStaticMesh->GetComponentLocation().Z), dragPoint, DrawLineColor, SDPG_World, DragLineThickness);
 	}
 }
 
@@ -118,9 +121,7 @@ void ADraggableActor::RefreshComponents()
 	{
 		if (UStaticMeshComponent* primComp = Cast<UStaticMeshComponent>(component))
 		{
-			
 			StaticMeshes.AddUnique(primComp);
-
 		}
 
 		if (UBoxComponent* boxComp = Cast<UBoxComponent>(component))
@@ -132,6 +133,7 @@ void ADraggableActor::RefreshComponents()
 	if (staticMeshesCount != StaticMeshes.Num())
 	{
 		OnStaticMeshComponentChanged();
+		GenerateShapeDefinition();
 	}
 }
 
@@ -265,7 +267,7 @@ void ADraggableActor::SnapDraggable(class UBoxComponent* snapSocket, class UPrim
 	}
 }
 
-FGGJShapeDefinition ADraggableActor::ConvertToShapeDefinition()
+void ADraggableActor::GenerateShapeDefinition()
 {
 	int minX = 1000;
 	int minY = 1000;
@@ -303,12 +305,10 @@ FGGJShapeDefinition ADraggableActor::ConvertToShapeDefinition()
 		coord.Value -= minY;
 	}
 
-	FGGJShapeDefinition shapeDefinition = FGGJShapeDefinition();
+	ShapeDefinition = FGGJShapeDefinition();
 
 	for (TPair<int, int>& coord : coords)
 	{
-		shapeDefinition.SetShapeValue(coord.Key, coord.Value, true);
+		ShapeDefinition.SetShapeValue(coord.Key, coord.Value, true);
 	}
-
-	return shapeDefinition;
 }

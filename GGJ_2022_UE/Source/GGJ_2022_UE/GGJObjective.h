@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "GGJShapeDefinition.h"
+
 #include "GGJObjective.generated.h"
 
 USTRUCT(Blueprintable)
@@ -17,13 +20,22 @@ public:
 	int RessourceIndex = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ObjectiveId = 0;
+	int RessourceBlockCount = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ObjectiveId = 0;
+
+	UPROPERTY(BlueprintReadWrite)
 	bool IsCompleted = false;
+
+	uint32 ShapeCode;
 
 	FGGJObjective();
 	~FGGJObjective();
+
+	bool operator==(const FGGJObjective& rhs) const { return ObjectiveId == rhs.ObjectiveId; }
+
+	void GenerateShape(int randomSeed);
 };
 
 
