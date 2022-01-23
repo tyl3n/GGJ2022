@@ -15,13 +15,13 @@ class UGGJBlueprintLibrary : public UBlueprintFunctionLibrary
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "GGJ|Getters")
-	static class AGGJCharacter* GetLocalPlayer();
+	static class AGGJCharacter* GetLocalPlayer(UObject* context);
 
 	UFUNCTION(BlueprintCallable, Category = "GGJ|Getters")
-	static class AGGJPlayerState* GetLocalPlayerState();
+	static class AGGJPlayerState* GetLocalPlayerState(UObject* context);
 
 	UFUNCTION(BlueprintCallable, Category="GGJ")
-	static void TriggerMerge();
+	static void TriggerMerge(UObject* context);
 
 	UFUNCTION(BlueprintCallable, Category = "GGJ|ShapeDefinition")
 	static bool GetShapeDefinitionValue(const FGGJShapeDefinition& shapeDefinition, int x, int y);

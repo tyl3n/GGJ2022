@@ -6,19 +6,19 @@
 #include "GGJShapeDefinition.h"
 #include "GGJObjective.h"
 
-class AGGJCharacter* UGGJBlueprintLibrary::GetLocalPlayer()
+class AGGJCharacter* UGGJBlueprintLibrary::GetLocalPlayer(UObject* context)
 {
-	return Utils::GetLocalPlayer();
+	return Utils::GetLocalPlayer(context);
 }
 
-class AGGJPlayerState* UGGJBlueprintLibrary::GetLocalPlayerState()
+class AGGJPlayerState* UGGJBlueprintLibrary::GetLocalPlayerState(UObject* context)
 {
-	return Utils::GetLocalPlayerState();
+	return Utils::GetLocalPlayerState(context);
 }
 
-void UGGJBlueprintLibrary::TriggerMerge()
+void UGGJBlueprintLibrary::TriggerMerge(UObject* context)
 {
-	if (AGGJCharacter* player = GetLocalPlayer())
+	if (AGGJCharacter* player = GetLocalPlayer(context))
 	{
 		player->MergeTouchingDraggableActors();
 	}

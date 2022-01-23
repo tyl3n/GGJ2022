@@ -3,7 +3,11 @@
 
 #include "CoreMinimal.h"
 #include "GGJObjective.h"
+
 #include "GameFramework/GameStateBase.h"
+
+#include "GGJPlayerState.h"
+
 #include "GGJGameState.generated.h"
 
 UCLASS(minimalapi)
@@ -13,11 +17,16 @@ class AGGJGameState : public AGameStateBase
 
 public:
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Dynamic
+	UPROPERTY(Transient, Replicated, BlueprintReadOnly)
+	TArray<float> ResourcesBalance;
+
+	virtual void BeginPlay() override;
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 
-	UFUNCTION(BlueprintCallable)
-	void CompleteObjective(UPARAM(ref) TArray<FGGJObjective>& Objectives, UPARAM(ref) TArray<float>& Ressources, UPARAM(ref) int ObjectiveId
-		, UPARAM(ref) bool SentByServer);
+	void AdjustResources(EPlayerDuality duality, int resourceIndex, float adjustment);
+
 	AGGJGameState();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)

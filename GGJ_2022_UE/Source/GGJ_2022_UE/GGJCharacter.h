@@ -3,6 +3,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
+#include "GGJPlayerState.h"
+
 #include "GGJCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -39,6 +42,11 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 	void MergeTouchingDraggableActors();
+
+	void SacrificePiece_Client(class ADraggableActor* piece);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SacrificePiece(EPlayerDuality duality, int resourceIndex, float resourceAmount);
 	
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

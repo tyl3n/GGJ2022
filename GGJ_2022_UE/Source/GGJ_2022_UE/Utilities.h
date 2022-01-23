@@ -21,13 +21,13 @@ template< class T, class U > FORCEINLINE U MapClamped(T x, T minX, T maxX, U out
 
 struct Utils
 {
-	static class UWorld* GetGameWorld();
+	static class UWorld* GetGameWorld(UObject* context = nullptr);
 	static class AGGJGameState* GetGameState();
 	static class AGGJGameMode* GetGameMode();
 	static class AGGJWorldSettings* GetWorldSettings();
-	static class AGGJCharacter* GetLocalPlayer();
-	static class AGGJPlayerController* GetLocalPlayerController();
-	static class AGGJPlayerState* GetLocalPlayerState();
+	static class AGGJCharacter* GetLocalPlayer(UObject* context);
+	static class AGGJPlayerController* GetLocalPlayerController(UObject* context);
+	static class AGGJPlayerState* GetLocalPlayerState(UObject* context);
 
 
 	static float GetGameTime(); // local, starts upon game world start
