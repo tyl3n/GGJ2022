@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "GGJ|Getters")
 	static float GetElapsedGameTime(float timestamp);
 
+	UFUNCTION(BlueprintPure, Category = "GGJ|Getters")
+	static FColor GetResourceColor(UObject* context, int resourceID);
+
 	UFUNCTION(BlueprintCallable, Category="GGJ")
 	static void TriggerMerge(UObject* context);
 

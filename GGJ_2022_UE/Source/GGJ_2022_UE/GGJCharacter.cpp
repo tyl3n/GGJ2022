@@ -262,18 +262,18 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 
 void AGGJCharacter::SacrificePiece_Client(ADraggableActor* piece)
 {
-	if(AGGJPlayerState* playerState = Cast<AGGJPlayerState>(GetPlayerState()))
+	if (piece != nullptr)
 	{
-		Server_SacrificePiece(playerState->Duality, piece->RessourceID, piece->StaticMeshes.Num() / 20.0f);
-	}
-
-	if(piece != nullptr)
-	{
+		if(AGGJPlayerState* playerState = Cast<AGGJPlayerState>(GetPlayerState()))
+		{
+			Server_SacrificePiece(playerState->Duality, piece->RessourceID, piece->StaticMeshes.Num() / 20.0f, piece->ShapeDefinition.ToUInt32());
+		}
+	
 		piece->Destroy();
 	}
 }
 
-void AGGJCharacter::Server_SacrificePiece_Implementation(EPlayerDuality duality, int resourceIndex, float resourceAmount)
+void AGGJCharacter::Server_SacrificePiece_Implementation(EPlayerDuality duality, int resourceIndex, float resourceAmount, uint32 shapeCode)
 {
 	if (AGGJGameState* gameState = Utils::GetGameState())
 	{

@@ -18,6 +18,7 @@ void AGGJPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& Ou
 	DOREPLIFETIME(AGGJPlayerState, Duality);
 	DOREPLIFETIME(AGGJPlayerState, ActiveObjectives);
 	DOREPLIFETIME(AGGJPlayerState, CompletedObjectives);
+	DOREPLIFETIME(AGGJPlayerState, FailedObjectives);
 }
 
 void AGGJPlayerState::Tick(float deltaTime)
