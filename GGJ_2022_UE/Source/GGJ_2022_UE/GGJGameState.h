@@ -9,6 +9,13 @@
 #include "GGJPlayerState.h"
 
 #include "GGJGameState.generated.h"
+UENUM(BlueprintType)
+enum class EGameStatus : uint8
+{
+	Unassigned,
+	Won,
+	Lost,
+};
 
 UCLASS(minimalapi)
 class AGGJGameState : public AGameStateBase
@@ -22,14 +29,22 @@ public:
 	UPROPERTY(Transient, Replicated, BlueprintReadOnly)
 	TArray<float> ResourcesBalance;
 
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_GameStatus,BlueprintReadOnly)
+	EGameStatus GameStatus = EGameStatus::Unassigned;
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float deltaTime) override;
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 
 	void AdjustResources(EPlayerDuality duality, int resourceID, float adjustment);
 
+	bool CheckIfGameCompleted();
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	bool IsGameCompleted() const;
+	void DoGameCompletionLogic();
+
+	UFUNCTION()
+	void OnRep_GameStatus();
 
 	AGGJGameState();
 
