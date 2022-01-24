@@ -98,7 +98,7 @@ void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
 		TWEAKABLE float SpringMin = 500.0f;
 		float springMultiplier = MapClamped(dragLength, SpringMax, SpringMin, 0.0f, 1.0f);
 
-		FVector force = dragDir * (forceStrength  - (DragSprintMultiplier * dragLength * springMultiplier));
+		FVector force = dragDir * (forceStrength  - (DragSprintMultiplier * dragLength * springMultiplier)) * deltaTime;
 
 		MasterStaticMesh->AddForce(force);
 

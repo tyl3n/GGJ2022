@@ -29,7 +29,7 @@ public:
 	float AddedTimestamp = -1.0f;
 
 	UPROPERTY(Transient)
-	uint32 ShapeCode;
+	uint32 ShapeCode = 0;
 
 	FGGJObjective();
 	~FGGJObjective();
