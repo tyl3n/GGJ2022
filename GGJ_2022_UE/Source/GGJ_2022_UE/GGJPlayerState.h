@@ -67,6 +67,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnObjectiveCompleted();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnObjectiveQuarterLeft();
+
 	UFUNCTION()
 	void OnRep_Duality() { OnDualityChanged(); }
 };

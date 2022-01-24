@@ -34,6 +34,8 @@ public:
 	FGGJObjective();
 	~FGGJObjective();
 
+	float LastElapsedTime = -1.0f;
+
 	bool operator==(const FGGJObjective& rhs) const { return ObjectiveId == rhs.ObjectiveId; }
 
 	void GenerateShape(int randomSeed);
