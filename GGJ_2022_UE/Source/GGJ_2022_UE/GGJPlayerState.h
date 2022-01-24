@@ -30,10 +30,10 @@ public:
 	UPROPERTY(Transient, BlueprintReadWrite, ReplicatedUsing=OnRep_ActiveObjectives)
 	TArray<FGGJObjective> ActiveObjectives;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Replicated)
+	UPROPERTY(Transient, BlueprintReadOnly, Replicated = OnRep_CompletedObjectives)
 	TArray<FGGJObjective> CompletedObjectives;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Replicated)
+	UPROPERTY(Transient, BlueprintReadOnly, Replicated = OnRep_FailedObjectives)
 	TArray<FGGJObjective> FailedObjectives;
 
 	UPROPERTY(BlueprintAssignable)
@@ -47,10 +47,25 @@ public:
 	void CompleteObjective_Server(int objectiveId);
 
 	UFUNCTION()
-	void OnRep_ActiveObjectives();
+	void OnRep_ActiveObjectives(const TArray<FGGJObjective>& oldActiveObjectives);
+
+	UFUNCTION()
+	void OnRep_CompletedObjectives(const TArray<FGGJObjective>& oldCompletedObjectives);
+
+	UFUNCTION()
+	void OnRep_FailedObjectives(const TArray<FGGJObjective>& oldFailedObjectives);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDualityChanged();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnNewObjective();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnObjectiveFailed();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnObjectiveCompleted();
 
 	UFUNCTION()
 	void OnRep_Duality() { OnDualityChanged(); }

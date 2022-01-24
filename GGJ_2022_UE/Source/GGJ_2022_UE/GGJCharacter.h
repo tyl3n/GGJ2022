@@ -61,6 +61,12 @@ public:
 	
 	EMergeState GetAssociatedMergeState(ADraggableActor* actor) const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMergeSuccessful();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSacrifice();
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface

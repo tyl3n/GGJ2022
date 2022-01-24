@@ -63,6 +63,7 @@ void AGGJGameMode::Tick(float deltaTime)
 		{
 			if (AGGJPlayerState* ggjPlayerState = Cast<AGGJPlayerState>(playerState))
 			{
+				TArray<FGGJObjective> oldActiveObjective = ggjPlayerState->ActiveObjectives;
 				if(ggjPlayerState->ActiveObjectives.Num() < MaxConcurrentObjectives)
 				{
 					TArray<FGGJObjective>& desiredObjectives = (ggjPlayerState->Duality == EPlayerDuality::Angel) ? DesiredAngelObjectives : DesiredDevilObjectives;
@@ -71,8 +72,6 @@ void AGGJGameMode::Tick(float deltaTime)
 						if (!ggjPlayerState->HasObjective(objective.ObjectiveId))
 						{
 							ggjPlayerState->ActiveObjectives.Add(objective);
-							ggjPlayerState->OnRep_ActiveObjectives();
-							ggjPlayerState->FlushNetDormancy();
 						}
 
 						if (ggjPlayerState->ActiveObjectives.Num() >= MaxConcurrentObjectives)
@@ -81,13 +80,16 @@ void AGGJGameMode::Tick(float deltaTime)
 						}
 					}
 				}
+
+				if (ggjPlayerState->ActiveObjectives.Num() != oldActiveObjective.Num())
+				{
+					ggjPlayerState->OnRep_ActiveObjectives(oldActiveObjective);
+					ggjPlayerState->FlushNetDormancy();
+				}
 			}
 		}
 	}
-
-
 }
-
 
 void AGGJGameMode::GetAvailableMissionIndices(EPlayerDuality duality, TArray<int>& out_MissionIndices) const
 {

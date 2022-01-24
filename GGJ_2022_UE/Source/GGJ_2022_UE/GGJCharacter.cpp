@@ -360,6 +360,8 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 {
 	if (MergeableDraggableActors.Num() > 1)
 	{
+		bool bDidSomeMerging = false;
+		
 		MergeableDraggableActors.Sort([](const ADraggableActor& A, const ADraggableActor& B)
 			{
 				return A.ReleasedTimestamp < B.ReleasedTimestamp;
@@ -399,7 +401,14 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 
 				ADraggableActor::SnapDraggable(snapPair.Key, snapComponent);
 				ADraggableActor::MergeDraggable(Cast<ADraggableActor>(snapPair.Key->GetOwner()), Cast<ADraggableActor>(snapPair.Value->GetOwner()));
+
+				bDidSomeMerging = true;
 			}
+		}
+
+		if (bDidSomeMerging)
+		{
+			OnMergeSuccessful();
 		}
 	}
 }
@@ -414,6 +423,8 @@ void AGGJCharacter::SacrificePiece_Client(ADraggableActor* piece)
 		}
 	
 		piece->Destroy();
+
+		OnSacrifice();
 	}
 }
 

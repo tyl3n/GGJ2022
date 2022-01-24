@@ -27,7 +27,9 @@ void AGGJPlayerState::Tick(float deltaTime)
 
 	if(HasAuthority())
 	{
-		bool bObjectivesChanged = false;
+		TArray<FGGJObjective> oldObjectives = ActiveObjectives;
+		TArray<FGGJObjective> oldFailedObjectives = FailedObjectives;
+		
 		for (int i = ActiveObjectives.Num() - 1; i >= 0; --i)
 		{
 			float elapsedTime = Utils::ElapsedTime(ActiveObjectives[i].AddedTimestamp);
@@ -35,13 +37,18 @@ void AGGJPlayerState::Tick(float deltaTime)
 			{
 				FailedObjectives.Add(ActiveObjectives[i]);
 				ActiveObjectives.RemoveAt(i);
-				bObjectivesChanged = true;
 			}
 		}
 
-		if(bObjectivesChanged)
+		if(oldObjectives.Num() != ActiveObjectives.Num())
 		{
-			OnRep_ActiveObjectives();
+			OnRep_ActiveObjectives(oldObjectives);
+			FlushNetDormancy();
+		}
+
+		if (oldFailedObjectives.Num() != FailedObjectives.Num())
+		{
+			OnRep_FailedObjectives(oldFailedObjectives);
 			FlushNetDormancy();
 		}
 	}
@@ -78,6 +85,9 @@ bool AGGJPlayerState::HasObjective(int objectiveId) const
 
 void AGGJPlayerState::CompleteObjective_Server(int objectiveId)
 {
+	TArray<FGGJObjective> oldObjectives = ActiveObjectives;
+	TArray<FGGJObjective> oldCompletedObjectives = CompletedObjectives;
+
 	for (int i = ActiveObjectives.Num() - 1; i >= 0; --i)
 	{
 		if (ActiveObjectives[i].ObjectiveId == objectiveId)
@@ -85,7 +95,8 @@ void AGGJPlayerState::CompleteObjective_Server(int objectiveId)
 			CompletedObjectives.Add(ActiveObjectives[i]);
 			ActiveObjectives.RemoveAt(i);
 
-			OnRep_ActiveObjectives();
+			OnRep_ActiveObjectives(oldObjectives);
+			OnRep_CompletedObjectives(oldCompletedObjectives);
 			FlushNetDormancy();
 
 			return; // DONE
@@ -93,7 +104,7 @@ void AGGJPlayerState::CompleteObjective_Server(int objectiveId)
 	}
 }
 
-void AGGJPlayerState::OnRep_ActiveObjectives()
+void AGGJPlayerState::OnRep_ActiveObjectives(const TArray<FGGJObjective>& oldActiveObjectives)
 {
 	for (FGGJObjective& objective : ActiveObjectives)
 	{
@@ -104,5 +115,26 @@ void AGGJPlayerState::OnRep_ActiveObjectives()
 		}
 	}
 
+	if (ActiveObjectives.Num() > oldActiveObjectives.Num())
+	{
+		OnNewObjective();
+	}
+
 	OnActiveObjectiveChanged.Broadcast(this);
+}
+
+void AGGJPlayerState::OnRep_CompletedObjectives(const TArray<FGGJObjective>& oldCompletedObjectives)
+{
+	if (CompletedObjectives.Num() > oldCompletedObjectives.Num())
+	{
+		OnObjectiveCompleted();
+	}
+}
+
+void AGGJPlayerState::OnRep_FailedObjectives(const TArray<FGGJObjective>& oldFailedObjectives)
+{
+	if (FailedObjectives.Num() > oldFailedObjectives.Num())
+	{
+		OnObjectiveFailed();
+	}
 }
