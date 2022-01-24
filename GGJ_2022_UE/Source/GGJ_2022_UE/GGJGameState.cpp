@@ -21,9 +21,16 @@ void AGGJGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutL
 void AGGJGameState::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
+
+	
 	if (HasAuthority())
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("GameState ServerTick"));
 		CheckIfGameCompleted();
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("GameState ClientTick"));
 	}
 }
 
@@ -101,13 +108,14 @@ bool AGGJGameState::CheckIfGameCompleted()
 		return false;
 	}
 
-	if(PlayerArray.Num() > 1)
+	if(PlayerArray.Num() >= 1)
 	{
 		for (int i = 0; i < ResourcesBalance.Num(); ++i)
 		{
-			if (ResourcesBalance[i] <= 0.0f || ResourcesBalance[i] >= 1.0f)
+			if (ResourcesBalance[i] <= 0.001f || ResourcesBalance[i] >= 0.999999f)
 			{
 				GameStatus = EGameStatus::Lost;
+				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("You Lose"));
 				OnRep_GameStatus();
 				return true;
 			
@@ -124,13 +132,13 @@ bool AGGJGameState::CheckIfGameCompleted()
 				ggjPlayerStateIt->CompletedObjectives.Num() + ggjPlayerStateIt->FailedObjectives.Num() == gameMode->AvailableMissions.Num());
 		}
 	}
+
 	if (haveAllPlayersFinishedObjectives) 
 	{
 		GameStatus = EGameStatus::Won;
 		OnRep_GameStatus();
 		return true;
 	}
-
 	return false;
 }
 
