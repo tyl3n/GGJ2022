@@ -25,12 +25,7 @@ void AGGJGameState::Tick(float deltaTime)
 	
 	if (HasAuthority())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("GameState ServerTick"));
 		CheckIfGameCompleted();
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("GameState ClientTick"));
 	}
 }
 
