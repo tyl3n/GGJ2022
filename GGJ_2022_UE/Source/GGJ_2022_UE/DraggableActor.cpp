@@ -122,6 +122,7 @@ void ADraggableActor::RefreshComponents()
 		if (UStaticMeshComponent* primComp = Cast<UStaticMeshComponent>(component))
 		{
 			StaticMeshes.AddUnique(primComp);
+			CreateMeshTag(primComp);
 		}
 
 		if (UBoxComponent* boxComp = Cast<UBoxComponent>(component))
@@ -153,6 +154,22 @@ void ADraggableActor::MergeDraggable(ADraggableActor* actorA, ADraggableActor* a
 {
 	if (ensure(actorA != nullptr && actorB != nullptr))
 	{
+		while (actorA->MergedInto != nullptr)
+		{
+			actorA = actorA->MergedInto;
+		}
+
+		while (actorB->MergedInto)
+		{
+			actorB = actorB->MergedInto;
+		}
+
+		if (actorA == actorB)
+		{
+			// Already merged
+			return;
+		}
+
 		if (actorA->MasterStaticMesh != nullptr)
 		{
 			for (UActorComponent* component : actorB->GetComponents())
@@ -170,6 +187,7 @@ void ADraggableActor::MergeDraggable(ADraggableActor* actorA, ADraggableActor* a
 					actorComponent->SetWorldTransform(primComp->GetComponentTransform());
 					actorComponent->RegisterComponent();
 					actorComponent->InitializeComponent();
+					CopyMeshTag(primComp, actorComponent);
 				}
 
 				if (UBoxComponent* boxComp = Cast<UBoxComponent>(component))
@@ -190,13 +208,14 @@ void ADraggableActor::MergeDraggable(ADraggableActor* actorA, ADraggableActor* a
 			}
 		}
 
+		actorB->MergedInto = actorA;
 		actorB->Destroy();
 		actorA->RefreshComponents();
 		actorA->RefreshMass();
 	}
 }
 
-void ADraggableActor::ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActor* snapMover, class UBoxComponent*& out_SnapSocket, class UStaticMeshComponent*& out_SnapComponent)
+float ADraggableActor::ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActor* snapMover, class UBoxComponent*& out_SnapSocket, class UStaticMeshComponent*& out_SnapComponent)
 {
 	float bestOverlapDistanceSqr = BIG_NUMBER;
 	out_SnapSocket = nullptr;
@@ -225,6 +244,8 @@ void ADraggableActor::ComputeSnapPair(ADraggableActor* snapPivot, ADraggableActo
 			}
 		}
 	}
+
+	return bestOverlapDistanceSqr;
 }
 
 void ADraggableActor::SnapDraggable(class UBoxComponent* snapSocket, class UPrimitiveComponent* snapComponent)
@@ -255,16 +276,21 @@ void ADraggableActor::SnapDraggable(class UBoxComponent* snapSocket, class UPrim
 
 	FVector snapSocketScale = snapComponent->GetComponentScale();
 
-
+	UPrimitiveComponent* primComp;
 	if (snapComponent->GetAttachParent() == nullptr)
 	{
 		// Root
-		snapComponent->SetWorldTransform(FTransform(snapSocketQuat, snapSocketLocation, snapSocketScale));
+		primComp = snapComponent;
 	}
 	else
 	{
-		snapComponent->GetAttachParent()->SetWorldTransform(FTransform(snapSocketQuat, snapSocketLocation, snapSocketScale));
+		primComp = Cast<UPrimitiveComponent>(snapComponent->GetAttachParent());
 	}
+
+	FTransform newTransform = FTransform(snapSocketQuat, snapSocketLocation, snapSocketScale);
+	FTransform deltaTransform = newTransform * primComp->GetComponentTransform().Inverse();
+
+	primComp->SetWorldTransform(newTransform);
 }
 
 void ADraggableActor::GenerateShapeDefinition()
@@ -311,4 +337,61 @@ void ADraggableActor::GenerateShapeDefinition()
 	{
 		ShapeDefinition.SetShapeValue(coord.Key, coord.Value, true);
 	}
+}
+
+UStaticMeshComponent* ADraggableActor::FindStaticMeshByTag(FString meshTag)
+{
+	for (UStaticMeshComponent* staticMesh : StaticMeshes)
+	{
+		FString tagMesh = GetMeshTag(staticMesh);
+		if (tagMesh == meshTag)
+		{
+			return staticMesh;
+		}
+	}
+
+	return nullptr;
+}
+
+FString ADraggableActor::GetMeshTag(class UPrimitiveComponent* primComp)
+{
+	if (primComp != nullptr)
+	{
+		for (const FName& tag : primComp->ComponentTags)
+		{
+			if (tag.ToString().StartsWith(TEXT("Name:")))
+			{
+				return tag.ToString();
+			}
+		}
+	}
+
+	return TEXT("");
+}
+
+FString ADraggableActor::CreateMeshTag(class UPrimitiveComponent* primComp)
+{
+	if (primComp != nullptr)
+	{
+		FString tag = GetMeshTag(primComp);
+		if (tag.IsEmpty())
+		{
+			FString newTag = FString::Printf(TEXT("Name:%s.%s"), *primComp->GetOwner()->GetName(), *primComp->GetName());
+			primComp->ComponentTags.Add(*newTag);
+
+			return newTag;
+		}
+		else
+		{
+			return tag;
+		}
+	}
+
+	return TEXT("");
+}
+
+void ADraggableActor::CopyMeshTag(class UPrimitiveComponent* primCompFrom, class UPrimitiveComponent* primCompTo)
+{
+	FString tagFrom = CreateMeshTag(primCompFrom);
+	primCompTo->ComponentTags.Add(FName(*tagFrom));
 }

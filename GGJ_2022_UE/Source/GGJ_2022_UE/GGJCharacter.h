@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 
 #include "GGJPlayerState.h"
+#include "DraggableActor.h"
 
 #include "GGJCharacter.generated.h"
 
@@ -47,6 +48,9 @@ protected:
 	void CheatSpawnResource(int resourceId);
 
 public:
+
+	bool GetDraggableActorBestMergeMatch(ADraggableActor* draggable, TPair<class UBoxComponent*, class UStaticMeshComponent*>& out_MergeMatch) const;
+
 	UFUNCTION(BlueprintCallable)
 	void MergeTouchingDraggableActors();
 
@@ -55,6 +59,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SacrificePiece(EPlayerDuality duality, int resourceID, float resourceAmount, uint32 shapeCode);
 	
+	EMergeState GetAssociatedMergeState(ADraggableActor* actor) const;
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
