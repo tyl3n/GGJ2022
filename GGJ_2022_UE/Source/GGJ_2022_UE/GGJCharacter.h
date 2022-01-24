@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ADraggableActor> CheatSpawnActor;
 
+	UPROPERTY(EditDefaultsOnly)
+	float DigitalRotationMultiplier = 0.25f;
+
 	//////////////////////////////////////////////////////////////////////////
 	/// Dynamic
 
@@ -44,6 +47,7 @@ protected:
 	void SelectReleased();
 
 	void RotateDraggable(float value);
+	void RotateDraggableDigital(float value);
 
 	void CheatSpawnResource(int resourceId);
 

@@ -52,20 +52,21 @@ void AGGJPlayerState::Tick(float deltaTime)
 			FlushNetDormancy();
 		}
 	}
-	else
+
+	// Clients
 	{
 		for (int i = ActiveObjectives.Num() - 1; i >= 0; --i)
 		{
-			float elapsedTime = Utils::ElapsedTime(ActiveObjectives[i].AddedTimestamp);
+			float timeLeft = ActiveObjectives[i].Duration - Utils::ElapsedTime(ActiveObjectives[i].AddedTimestamp);
 
 			float quarterDuration = ActiveObjectives[i].Duration * 0.25f;
 
-			if (ActiveObjectives[i].LastElapsedTime > 0.0f && ActiveObjectives[i].LastElapsedTime >= quarterDuration && elapsedTime < quarterDuration)
+			if (ActiveObjectives[i].TimeLeft > 0.0f && ActiveObjectives[i].TimeLeft >= quarterDuration && timeLeft < quarterDuration)
 			{
 				OnObjectiveQuarterLeft();
 			}
 
-			ActiveObjectives[i].LastElapsedTime = elapsedTime;
+			ActiveObjectives[i].TimeLeft = timeLeft;
 		}
 	}
 }

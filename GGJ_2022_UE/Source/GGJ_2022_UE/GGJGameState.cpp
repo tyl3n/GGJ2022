@@ -101,16 +101,20 @@ bool AGGJGameState::CheckIfGameCompleted()
 		return false;
 	}
 
-	for (int i = 0; i < ResourcesBalance.Num(); ++i)
+	if(PlayerArray.Num() > 1)
 	{
-		if (ResourcesBalance[i] <= 0.0f || ResourcesBalance[i] >= 1.0f)
+		for (int i = 0; i < ResourcesBalance.Num(); ++i)
 		{
-			GameStatus = EGameStatus::Lost;
-			OnRep_GameStatus();
-			return true;
+			if (ResourcesBalance[i] <= 0.0f || ResourcesBalance[i] >= 1.0f)
+			{
+				GameStatus = EGameStatus::Lost;
+				OnRep_GameStatus();
+				return true;
 			
-		}	
+			}	
+		}
 	}
+
 	bool haveAllPlayersFinishedObjectives = true;
 	for (APlayerState* playerState : PlayerArray)
 	{

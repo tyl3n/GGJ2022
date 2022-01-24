@@ -23,6 +23,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	int MaxConcurrentObjectives = 5;
 
+	UPROPERTY(EditAnywhere)
+	int MinConcurrentObjectives = 2;
+
 	//////////////////////////////////////////////////////////////////////////
 	/// Dynamic
 

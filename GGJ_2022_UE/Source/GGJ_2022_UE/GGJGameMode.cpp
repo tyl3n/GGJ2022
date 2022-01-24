@@ -49,16 +49,44 @@ void AGGJGameMode::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	if (!Utils::IsRecentEvent(LastMissionAssignTimestamp, MissionsInterval))
-	{
-		AssignNewObjective(EPlayerDuality::Angel);
-		AssignNewObjective(EPlayerDuality::Devil);
-
-		LastMissionAssignTimestamp = Utils::GetGameTime();
-	}
-
 	if (AGGJGameState* gameState = Utils::GetGameState())
 	{
+		bool bShouldGiveDevilObjective = !Utils::IsRecentEvent(LastMissionAssignTimestamp, MissionsInterval);
+		bool bShouldGiveAngelObjective = !Utils::IsRecentEvent(LastMissionAssignTimestamp, MissionsInterval);
+
+		for (APlayerState* playerState : gameState->PlayerArray)
+		{
+			if (AGGJPlayerState* ggjPlayerState = Cast<AGGJPlayerState>(playerState))
+			{
+				if (ggjPlayerState->ActiveObjectives.Num() < MinConcurrentObjectives)
+				{
+					if (ggjPlayerState->Duality == EPlayerDuality::Angel)
+					{
+						bShouldGiveAngelObjective = true;
+					}
+					else if (ggjPlayerState->Duality == EPlayerDuality::Devil)
+					{
+						bShouldGiveDevilObjective = true;
+					}
+				}
+			}
+		}
+
+		if (bShouldGiveDevilObjective || bShouldGiveAngelObjective)
+		{
+			if (bShouldGiveAngelObjective)
+			{
+				AssignNewObjective(EPlayerDuality::Angel);
+			}
+
+			if(bShouldGiveDevilObjective)
+			{
+				AssignNewObjective(EPlayerDuality::Devil);
+			}
+
+			LastMissionAssignTimestamp = Utils::GetGameTime();
+		}
+
 		for (APlayerState* playerState : gameState->PlayerArray)
 		{
 			if (AGGJPlayerState* ggjPlayerState = Cast<AGGJPlayerState>(playerState))

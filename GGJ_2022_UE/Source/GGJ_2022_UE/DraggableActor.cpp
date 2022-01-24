@@ -18,17 +18,20 @@ void ADraggableActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	RefreshComponents();
-	RefreshMass();
-
-	for (UStaticMeshComponent* staticMesh : StaticMeshes)
+	for (UActorComponent* component : GetComponents())
 	{
-		if (staticMesh->GetAttachParent() == nullptr)
+		if(UStaticMeshComponent* staticMesh = Cast<UStaticMeshComponent>(component))
 		{
-			MasterStaticMesh = staticMesh;
-			break;
+			if (staticMesh->GetAttachParent() == nullptr)
+			{
+				MasterStaticMesh = staticMesh;
+				break;
+			}
 		}
 	}
+
+	RefreshComponents();
+	RefreshMass();
 
 	for (UBoxComponent* boxCOmp : BoxComponents)
 	{
@@ -66,6 +69,16 @@ void ADraggableActor::OnDraggableReleased_Implementation()
 void ADraggableActor::OnDragged_Implementation(float length)
 {
 	bDraging = true;
+}
+
+FVector ADraggableActor::GetDraggableCenter() const
+{
+	if (MasterStaticMesh != nullptr)
+	{
+		return MasterStaticMesh->GetComponentTransform().TransformPosition(RelativeCenter);
+	}
+
+	return FVector::ZeroVector;
 }
 
 void ADraggableActor::Drag(FVector& dragPoint, float deltaTime)
@@ -110,12 +123,15 @@ void ADraggableActor::Rotate(float dirSign)
 {
 	if (MasterStaticMesh != nullptr)
 	{
-		MasterStaticMesh->AddAngularImpulseInRadians(FVector(dirSign * RotateMultiplier, dirSign * RotateMultiplier, dirSign * RotateMultiplier) * StaticMeshes.Num(), NAME_None, RotateAsVelChange);
+		MasterStaticMesh->AddAngularImpulseInRadians(FVector(dirSign * RotateMultiplier, dirSign * RotateMultiplier, dirSign * RotateMultiplier) * FMath::Pow((float)StaticMeshes.Num(), RotateExpOnStaticMeshNum), NAME_None, RotateAsVelChange);
 	}
 }
 
 void ADraggableActor::RefreshComponents()
 {
+	FVector center = FVector::ZeroVector;
+	int centerCOunt = 0;
+
 	int staticMeshesCount = StaticMeshes.Num();
 	for (UActorComponent* component : GetComponents())
 	{
@@ -123,6 +139,9 @@ void ADraggableActor::RefreshComponents()
 		{
 			StaticMeshes.AddUnique(primComp);
 			CreateMeshTag(primComp);
+
+			++centerCOunt;
+			center += primComp->GetComponentLocation();
 		}
 
 		if (UBoxComponent* boxComp = Cast<UBoxComponent>(component))
@@ -135,6 +154,12 @@ void ADraggableActor::RefreshComponents()
 	{
 		OnStaticMeshComponentChanged();
 		GenerateShapeDefinition();
+
+		FVector worldCenter = center / (float)centerCOunt;
+		if (MasterStaticMesh != nullptr)
+		{
+			RelativeCenter = MasterStaticMesh->GetComponentTransform().InverseTransformPosition(worldCenter);
+		}
 	}
 }
 
@@ -142,10 +167,10 @@ void ADraggableActor::RefreshMass()
 {
 	if(StaticMeshes.Num() > 0)
 	{
-		float splitMass = Mass / (float)(StaticMeshes.Num());
+		float splitMass = Mass / FMath::Pow((float)StaticMeshes.Num(), MassExpOnStaticMeshNum);
 		for (UStaticMeshComponent* component : StaticMeshes)
 		{
-			component->SetMassOverrideInKg(NAME_None, splitMass);
+			component->SetMassOverrideInKg(NAME_None, splitMass, true);
 		}
 	}
 }

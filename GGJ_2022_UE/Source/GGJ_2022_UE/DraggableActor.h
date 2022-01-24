@@ -27,11 +27,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float DragForceBaseMultiplier = 100.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+	float MassExpOnStaticMeshNum = 1.0f;
+
 	UPROPERTY(EditDefaultsOnly, meta=(DisplayName="Drag Spring Multiplier"))
 	float DragSprintMultiplier = 100.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RotateMultiplier = 100.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float RotateExpOnStaticMeshNum = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	bool RotateAsVelChange = false;
@@ -79,6 +85,8 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly)
 	TArray<class UBoxComponent*> BoxComponents;
 
+	FVector RelativeCenter;
+
 	UPROPERTY(Transient)
 	ADraggableActor* MergedInto = nullptr;
 
@@ -104,6 +112,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnDragged(float distance);
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetDraggableCenter() const;
 
 	virtual void Drag(FVector& dragPoint, float deltaTime);
 	virtual float GetDraggableZ() const;

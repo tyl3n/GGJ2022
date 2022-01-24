@@ -109,9 +109,17 @@ void AGGJCharacter::TickMergables()
 
 							FVector overlapCompLocation = overlapComp->GetComponentLocation();
 
-							float overlapDistSqr = (overlapCompLocation - primComp->GetComponentLocation()).SizeSquared2D();
-							float dot = primComp->GetForwardVector() | overlapComp->GetForwardVector();
-							if (overlapDistSqr < DistanceLimitSqr && (FMath::Abs(dot) >= (1.0f - DotLimit) || FMath::Abs(dot) <= DotLimit))
+							bool bPlacement = true;
+
+							// Ignore this for now
+							if(false)
+							{
+								float overlapDistSqr = (overlapCompLocation - primComp->GetComponentLocation()).SizeSquared2D();
+								float dot = primComp->GetForwardVector() | overlapComp->GetForwardVector();
+								bPlacement = (overlapDistSqr < DistanceLimitSqr && (FMath::Abs(dot) >= (1.0f - DotLimit) || FMath::Abs(dot) <= DotLimit));
+							}
+
+							if(bPlacement)
 							{
 								mergeableDraggableActors.AddUnique(draggableActor);
 							}
@@ -242,6 +250,7 @@ void AGGJCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 	PlayerInputComponent->AddActionBinding(Cheat_SpawnResourceRandom);
 
 	PlayerInputComponent->BindAxis("Rotate", this, &AGGJCharacter::RotateDraggable);
+	PlayerInputComponent->BindAxis("RotateDigital", this, &AGGJCharacter::RotateDraggableDigital);
 }
 
 void AGGJCharacter::SelectPressed()
@@ -290,6 +299,17 @@ void AGGJCharacter::RotateDraggable(float value)
 		if (DraggedActor != nullptr)
 		{
 			DraggedActor->Rotate(value);
+		}
+	}
+}
+
+void AGGJCharacter::RotateDraggableDigital(float value)
+{
+	if (value != 0.0f)
+	{
+		if (DraggedActor != nullptr)
+		{
+			DraggedActor->Rotate(DigitalRotationMultiplier * value);
 		}
 	}
 }
@@ -364,7 +384,14 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 		
 		MergeableDraggableActors.Sort([](const ADraggableActor& A, const ADraggableActor& B)
 			{
-				return A.ReleasedTimestamp < B.ReleasedTimestamp;
+				if(A.StaticMeshes.Num() == B.StaticMeshes.Num())
+				{
+					return A.ReleasedTimestamp < B.ReleasedTimestamp;
+				}
+				else
+				{
+					return A.StaticMeshes.Num() > B.StaticMeshes.Num();
+				}
 			});
 
 		TArray< TPair<UBoxComponent*, UStaticMeshComponent*> > snapPairs;
@@ -408,6 +435,15 @@ void AGGJCharacter::MergeTouchingDraggableActors()
 
 		if (bDidSomeMerging)
 		{
+			// Clean up
+			for (ADraggableActor* draggable : MergeableDraggableActors)
+			{
+				if (draggable)
+				{
+					draggable->MergedInto = nullptr;
+				}
+			}
+
 			OnMergeSuccessful();
 		}
 	}
