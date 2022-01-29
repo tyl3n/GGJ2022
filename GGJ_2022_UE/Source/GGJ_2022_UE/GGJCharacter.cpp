@@ -224,6 +224,7 @@ void AGGJCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Select", IE_Pressed, this, &AGGJCharacter::SelectPressed);
 	PlayerInputComponent->BindAction("Select", IE_Released, this, &AGGJCharacter::SelectReleased);
+	PlayerInputComponent->BindAction("Merge", IE_Released, this, &AGGJCharacter::MergeTouchingDraggableActors);
 
 	FInputActionBinding CheatSpawnResource0("Cheat_SpawnResource0", IE_Pressed);
 	CheatSpawnResource0.ActionDelegate.GetDelegateForManualSet().BindLambda([this](){ CheatSpawnResource(0); });

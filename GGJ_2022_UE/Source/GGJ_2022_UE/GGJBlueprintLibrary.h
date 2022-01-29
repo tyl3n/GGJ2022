@@ -29,6 +29,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "GGJ|Getters")
 	static FColor GetResourceColor(UObject* context, int resourceID);
 
+	UFUNCTION(BlueprintPure, Category = "GGJ|Getters")
+	static class AGGJWorldSettings* GetWorldSettings(UObject* context);
+
 	UFUNCTION(BlueprintCallable, Category="GGJ")
 	static void TriggerMerge(UObject* context);
 

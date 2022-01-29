@@ -36,6 +36,19 @@ float UGGJBlueprintLibrary::GetElapsedGameTime(float timestamp)
 	return Utils::ElapsedTime(timestamp);
 }
 
+AGGJWorldSettings* UGGJBlueprintLibrary::GetWorldSettings(UObject* context)
+{
+	if (context != nullptr)
+	{
+		if (UWorld* world = context->GetWorld())
+		{
+			return Cast<AGGJWorldSettings>(world->GetWorldSettings());
+		}
+	}
+
+	return nullptr;
+}
+
 FColor UGGJBlueprintLibrary::GetResourceColor(UObject* context, int resourceID)
 {
 	if (Utils::IsInEditor(context))
