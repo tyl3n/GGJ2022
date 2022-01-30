@@ -107,7 +107,7 @@ bool AGGJGameState::CheckIfGameCompleted()
 		return false;
 	}
 
-	if(PlayerArray.Num() >= 1)
+	if(PlayerArray.Num() > 1)
 	{
 		for (int i = 0; i < ResourcesBalance.Num(); ++i)
 		{
