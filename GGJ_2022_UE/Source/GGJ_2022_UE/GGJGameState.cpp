@@ -16,6 +16,7 @@ void AGGJGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AGGJGameState, GameStatus);
 	DOREPLIFETIME(AGGJGameState, ResourcesBalance);
+	DOREPLIFETIME(AGGJGameState, NumberOfPlayers);
 }
 
 void AGGJGameState::Tick(float deltaTime)
@@ -76,6 +77,9 @@ void AGGJGameState::AddPlayerState(APlayerState* PlayerState)
 			ggjPlayerState->OnRep_Duality();
 			ggjPlayerState->FlushNetDormancy();
 		}
+
+		++NumberOfPlayers;
+		OnRep_NumberOfPlayers(); 
 
 		FlushNetDormancy();
 	}
@@ -143,6 +147,11 @@ void AGGJGameState::OnRep_GameStatus()
 	{
 		DoGameCompletionLogic();
 	}
+}
+
+void AGGJGameState::OnRep_NumberOfPlayers()
+{
+	OnPlayerCountChanged.Broadcast();
 }
 
 void AGGJGameState::DoGameCompletionLogic_Implementation()

@@ -17,6 +17,9 @@ enum class EGameStatus : uint8
 	Lost,
 };
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameStateEvent);
+
 UCLASS(minimalapi)
 class AGGJGameState : public AGameStateBase
 {
@@ -32,6 +35,12 @@ public:
 	UPROPERTY(Transient, ReplicatedUsing=OnRep_GameStatus,BlueprintReadOnly)
 	EGameStatus GameStatus = EGameStatus::Unassigned;
 
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_NumberOfPlayers, BlueprintReadOnly)
+	int NumberOfPlayers = 0;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnGameStateEvent OnPlayerCountChanged;
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float deltaTime) override;
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
@@ -45,6 +54,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_GameStatus();
+
+	UFUNCTION()
+	void OnRep_NumberOfPlayers();
 
 	AGGJGameState();
 
